@@ -5,17 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quick Lot Scanner</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#111111" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-
-  <!-- iOS icon -->
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <!-- Cache-bust CSS on iOS PWA -->
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
 </head>
 
 <body>
@@ -23,9 +19,9 @@
     <header class="top">
       <div>
         <h1>Quick Lot Scanner</h1>
-        <p class="muted">Counts → totals → melt → offer. Offline.</p>
+        <p class="muted">Per-bucket discounts → fast offers. Offline.</p>
       </div>
-      <div id="version" class="version">v3</div>
+      <div id="version" class="version">v4</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -35,26 +31,18 @@
       <div class="grid2">
         <div>
           <label for="spotSilver">Silver spot ($/oz)</label>
-          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 85.00" />
+          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 119.00" />
         </div>
         <div>
           <label for="spotGold">Gold spot ($/oz)</label>
-          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 4800.00" />
+          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 5300.00" />
         </div>
-      </div>
-
-      <div class="discount">
-        <label for="discount">
-          Offer discount: <strong><span id="discountLabel">0%</span></strong>
-        </label>
-        <input id="discount" type="range" min="0" max="50" step="0.5" value="0" />
-        <div class="muted small">Applies to melt totals to suggest a fast offer.</div>
       </div>
 
       <div class="row">
         <label class="inline" for="use715">
           <input id="use715" type="checkbox" checked />
-          Use 90% “worn avg” rule (0.715 oz ASW per $1 FV)
+          90% $1 FV → 0.715 oz ASW (worn avg). Uncheck for 0.7234 oz (BU).
         </label>
       </div>
 
@@ -66,11 +54,14 @@
       <div id="status" class="status muted small"></div>
     </section>
 
-    <!-- SILVER -->
+    <!-- 90% -->
     <section class="panel">
-      <h2>Silver counts</h2>
+      <div class="panelHead">
+        <h2>90% junk + 90% dollars</h2>
+        <div class="discInline">Discount: <strong><span id="d90Label">0%</span></strong></div>
+      </div>
 
-      <div class="grid3">
+      <div class="grid4">
         <div>
           <label for="h90">90% halves (count)</label>
           <input id="h90" type="text" inputmode="numeric" placeholder="0" />
@@ -83,34 +74,151 @@
           <label for="d90">90% dimes (count)</label>
           <input id="d90" type="text" inputmode="numeric" placeholder="0" />
         </div>
+        <div>
+          <label for="sd90">90% $1 dollars (Morgan/Peace) (count)</label>
+          <input id="sd90" type="text" inputmode="numeric" placeholder="0" />
+        </div>
       </div>
 
-      <div class="grid2">
+      <div class="discount">
+        <input id="disc90" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>90% FV (halves/quarters/dimes)</span><strong id="outFV90">$0.00</strong></div>
+        <div class="miniRow"><span>90% dollars (count)</span><strong id="outD90">0</strong></div>
+        <div class="miniRow"><span>ASW oz (90% FV)</span><strong id="outASW90FV">0.00</strong></div>
+        <div class="miniRow"><span>ASW oz (90% dollars)</span><strong id="outASW90D">0.00</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMelt90">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOffer90">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- 40% -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>40% halves + 40% dollars</h2>
+        <div class="discInline">Discount: <strong><span id="d40Label">0%</span></strong></div>
+      </div>
+
+      <div class="grid3">
         <div>
           <label for="h40">40% halves (count)</label>
           <input id="h40" type="text" inputmode="numeric" placeholder="0" />
         </div>
         <div>
-          <label for="ozOtherSilver">Other .999 silver (oz)</label>
-          <input id="ozOtherSilver" type="text" inputmode="decimal" placeholder="0.00" />
+          <label for="sd40">40% $1 dollars (Eisenhower 40%) (count)</label>
+          <input id="sd40" type="text" inputmode="numeric" placeholder="0" />
         </div>
+        <div class="hintBox muted small">
+          Tip: Only the 40% Ikes in “blue/brown” packs. Clad Ikes are 0.
+        </div>
+      </div>
+
+      <div class="discount">
+        <input id="disc40" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>40% FV (halves)</span><strong id="outFV40">$0.00</strong></div>
+        <div class="miniRow"><span>40% dollars (count)</span><strong id="outD40">0</strong></div>
+        <div class="miniRow"><span>ASW oz (40% halves)</span><strong id="outASW40H">0.00</strong></div>
+        <div class="miniRow"><span>ASW oz (40% dollars)</span><strong id="outASW40D">0.00</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMelt40">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOffer40">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- .999 OTHER OZ -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>.999 silver ounces</h2>
+        <div class="discInline">Discount: <strong><span id="dOZLabel">0%</span></strong></div>
       </div>
 
       <div class="grid2">
         <div>
-          <label for="rounds">Generic rounds (count)</label>
+          <label for="ozOtherSilver">Other .999 silver (oz)</label>
+          <input id="ozOtherSilver" type="text" inputmode="decimal" placeholder="0.00" />
+        </div>
+        <div class="hintBox muted small">
+          Bars/shot/anything you want to enter as ounces.
+        </div>
+      </div>
+
+      <div class="discount">
+        <input id="discOz" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>Ounces</span><strong id="outOzOther">0.00</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMeltOz">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOfferOz">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- ROUNDS -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>Generic rounds</h2>
+        <div class="discInline">Discount: <strong><span id="dRndLabel">0%</span></strong></div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="rounds">Rounds (count)</label>
           <input id="rounds" type="text" inputmode="numeric" placeholder="0" />
         </div>
+        <div class="hintBox muted small">
+          Assumes 1.00 oz each.
+        </div>
+      </div>
+
+      <div class="discount">
+        <input id="discRounds" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>Ounces</span><strong id="outRndOz">0.00</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMeltRnd">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOfferRnd">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- ASE -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>American Silver Eagles</h2>
+        <div class="discInline">Discount: <strong><span id="dAseLabel">0%</span></strong></div>
+      </div>
+
+      <div class="grid2">
         <div>
-          <label for="ase">American Silver Eagles (count)</label>
+          <label for="ase">ASE (count)</label>
           <input id="ase" type="text" inputmode="numeric" placeholder="0" />
         </div>
+        <div class="hintBox muted small">
+          Assumes 1.00 oz each.
+        </div>
+      </div>
+
+      <div class="discount">
+        <input id="discAse" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>Ounces</span><strong id="outAseOz">0.00</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMeltAse">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOfferAse">$0.00</strong></div>
       </div>
     </section>
 
     <!-- GOLD -->
     <section class="panel">
-      <h2>Gold counts</h2>
+      <div class="panelHead">
+        <h2>Gold (pre-33 + AGE)</h2>
+        <div class="discInline">Discount: <strong><span id="dGoldLabel">0%</span></strong></div>
+      </div>
 
       <div class="grid4">
         <div>
@@ -149,69 +257,35 @@
           <input id="age100" type="text" inputmode="numeric" placeholder="0" />
         </div>
       </div>
+
+      <div class="discount">
+        <input id="discGold" type="range" min="0" max="10" step="0.5" value="0" />
+      </div>
+
+      <div class="miniResults">
+        <div class="miniRow"><span>AGW oz</span><strong id="outGoldOz">0.00000</strong></div>
+        <div class="miniRow"><span>Melt</span><strong id="outMeltGold">$0.00</strong></div>
+        <div class="miniRow big"><span>Offer</span><strong id="outOfferGold">$0.00</strong></div>
+      </div>
     </section>
 
-    <!-- RESULTS -->
+    <!-- TOTALS -->
     <section class="panel">
-      <h2>Results</h2>
+      <h2>Grand totals</h2>
 
       <div class="results">
-        <div class="resultRow">
-          <span>90% Face Value (FV)</span>
-          <strong id="outFV90">$0.00</strong>
-        </div>
-        <div class="resultRow">
-          <span>40% Face Value (FV)</span>
-          <strong id="outFV40">$0.00</strong>
-        </div>
-        <div class="resultRow">
-          <span>Total Face Value (FV)</span>
-          <strong id="outFVTotal">$0.00</strong>
-        </div>
-
-        <hr class="sep" />
-
-        <div class="resultRow">
-          <span>Bullion oz (Rounds + ASE)</span>
-          <strong id="outBullionOz">0.00</strong>
-        </div>
-        <div class="resultRow">
-          <span>Silver ASW total (oz)</span>
-          <strong id="outAsw">0.00</strong>
-        </div>
-        <div class="resultRow">
-          <span>Silver melt</span>
-          <strong id="outSilverMelt">$0.00</strong>
-        </div>
-
-        <hr class="sep" />
-
-        <div class="resultRow">
-          <span>Gold AGW total (oz)</span>
-          <strong id="outAgw">0.00000</strong>
-        </div>
-        <div class="resultRow">
-          <span>Gold melt</span>
-          <strong id="outGoldMelt">$0.00</strong>
-        </div>
-
-        <hr class="sep" />
-
         <div class="resultRow big">
           <span>Total melt</span>
-          <strong id="outTotal">$0.00</strong>
+          <strong id="outTotalMelt">$0.00</strong>
         </div>
         <div class="resultRow big">
-          <span>Suggested offer (−<span id="outDisc">0</span>%)</span>
-          <strong id="outOffer">$0.00</strong>
+          <span>Total offer (bucket discounts)</span>
+          <strong id="outTotalOffer">$0.00</strong>
         </div>
       </div>
 
       <div class="muted small">
-        Notes:
-        40% half uses <strong>0.1479 oz ASW</strong> each.
-        90% uses <strong>0.715 oz</strong> per $1 FV (worn avg) or <strong>0.7234 oz</strong> per $1 FV (BU).
-        Rounds and ASE assumed <strong>1.00 oz</strong> each.
+        This app is math only. It doesn’t include premium/numismatic value.
       </div>
     </section>
   </main>
@@ -219,4 +293,3 @@
   <script src="./app.js"></script>
 </body>
 </html>
-
