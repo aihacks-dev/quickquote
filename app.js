@@ -1,126 +1,145 @@
 const APP_VERSION = "v4";
+document.getElementById("version").textContent = APP_VERSION;
 
-// -------------------- Constants --------------------
-// 40% half dollar silver content (ASW, troy oz)
+// ---------------- Constants ----------------
+// 90% ASW per $1 FV
+const ASW_90_PER_DOLLAR_WORN = 0.7150;
+const ASW_90_PER_DOLLAR_BU   = 0.7234;
+
+// 40% halves ASW
 const ASW_40_HALF = 0.1479;
 
-// 90% conversion factors (per $1.00 face value)
-const ASW_90_PER_DOLLAR_WORN = 0.7150;  // worn avg
-const ASW_90_PER_DOLLAR_BU   = 0.7234;  // BU / less-worn
+// 90% silver dollars (Morgan/Peace): standard ASW
+const ASW_90_DOLLAR = 0.77344;
 
-// Pre-33 gold AGW (troy oz)
-const PRE33_AGW = {
-  g25: 0.12094,
-  g5:  0.24187,
-  g10: 0.48375,
-  g20: 0.96750
-};
+// 40% Eisenhower “silver” dollar ASW (blue/brown Ikes)
+const ASW_40_IKE = 0.31610;
 
-// AGE gold weights (troy oz)
-const AGE_AGW = {
-  age10:  0.10,
-  age25:  0.25,
-  age50:  0.50,
-  age100: 1.00
-};
+// Gold weights (AGW)
+const PRE33_AGW = { g25:0.12094, g5:0.24187, g10:0.48375, g20:0.96750 };
+const AGE_AGW   = { age10:0.10, age25:0.25, age50:0.50, age100:1.00 };
 
-// -------------------- DOM helpers --------------------
+// ---------------- DOM helpers ----------------
 const el = (id) => document.getElementById(id);
 
-// Version label
-el("version").textContent = APP_VERSION;
-
-// Inputs
 const spotSilver = el("spotSilver");
 const spotGold   = el("spotGold");
-const discount   = el("discount");
-const discountLabel = el("discountLabel");
-const outDisc = el("outDisc");
-const use715 = el("use715");
+const use715     = el("use715");
 
-// Silver counts
-const h90 = el("h90");
-const q90 = el("q90");
-const d90 = el("d90");
-const h40 = el("h40");
+// Inputs 90%
+const h90 = el("h90"), q90 = el("q90"), d90 = el("d90"), sd90 = el("sd90");
+const disc90 = el("disc90"); const d90Label = el("d90Label");
+
+// Inputs 40%
+const h40 = el("h40"), sd40 = el("sd40");
+const disc40 = el("disc40"); const d40Label = el("d40Label");
+
+// Other .999 oz
 const ozOtherSilver = el("ozOtherSilver");
+const discOz = el("discOz"); const dOZLabel = el("dOZLabel");
+
+// Rounds
 const rounds = el("rounds");
+const discRounds = el("discRounds"); const dRndLabel = el("dRndLabel");
+
+// ASE
 const ase = el("ase");
+const discAse = el("discAse"); const dAseLabel = el("dAseLabel");
 
-// Gold counts
-const g25 = el("g25");
-const g5  = el("g5");
-const g10 = el("g10");
-const g20 = el("g20");
-const age10  = el("age10");
-const age25  = el("age25");
-const age50  = el("age50");
-const age100 = el("age100");
+// Gold
+const g25 = el("g25"), g5 = el("g5"), g10 = el("g10"), g20 = el("g20");
+const age10 = el("age10"), age25 = el("age25"), age50 = el("age50"), age100 = el("age100");
+const discGold = el("discGold"); const dGoldLabel = el("dGoldLabel");
 
-// Buttons
-const saveBtn  = el("saveBtn");
+// Buttons / status
+const saveBtn = el("saveBtn");
 const clearBtn = el("clearBtn");
-const status   = el("status");
+const status = el("status");
 
-// Outputs
-const outFV90     = el("outFV90");
-const outFV40     = el("outFV40");
-const outFVTotal  = el("outFVTotal");
-const outBullionOz = el("outBullionOz");
+// Outputs 90%
+const outFV90 = el("outFV90");
+const outD90  = el("outD90");
+const outASW90FV = el("outASW90FV");
+const outASW90D  = el("outASW90D");
+const outMelt90  = el("outMelt90");
+const outOffer90 = el("outOffer90");
 
-const outAsw       = el("outAsw");
-const outSilverMelt= el("outSilverMelt");
-const outAgw       = el("outAgw");
-const outGoldMelt  = el("outGoldMelt");
-const outTotal     = el("outTotal");
-const outOffer     = el("outOffer");
+// Outputs 40%
+const outFV40 = el("outFV40");
+const outD40  = el("outD40");
+const outASW40H = el("outASW40H");
+const outASW40D = el("outASW40D");
+const outMelt40 = el("outMelt40");
+const outOffer40= el("outOffer40");
 
-// Everything that should trigger recalculation on input
-const recalcInputs = [
-  spotSilver, spotGold, discount, use715,
-  h90, q90, d90, h40, ozOtherSilver, rounds, ase,
-  g25, g5, g10, g20, age10, age25, age50, age100
-];
+// Outputs oz other
+const outOzOther = el("outOzOther");
+const outMeltOz  = el("outMeltOz");
+const outOfferOz = el("outOfferOz");
 
-// -------------------- Parsing/formatting --------------------
-function parseNum(v) {
+// Outputs rounds
+const outRndOz = el("outRndOz");
+const outMeltRnd = el("outMeltRnd");
+const outOfferRnd= el("outOfferRnd");
+
+// Outputs ASE
+const outAseOz = el("outAseOz");
+const outMeltAse = el("outMeltAse");
+const outOfferAse= el("outOfferAse");
+
+// Outputs gold
+const outGoldOz = el("outGoldOz");
+const outMeltGold = el("outMeltGold");
+const outOfferGold= el("outOfferGold");
+
+// Totals
+const outTotalMelt = el("outTotalMelt");
+const outTotalOffer= el("outTotalOffer");
+
+// ---------------- Parsing/formatting ----------------
+function parseNum(v){
   const raw = (v || "").toString().replace(/[$,\s]/g, "").trim();
   const n = parseFloat(raw);
   return Number.isFinite(n) ? n : 0;
 }
-
-function parseIntSafe(v) {
+function parseIntSafe(v){
   const raw = (v || "").toString().replace(/[^\d-]/g, "").trim();
   const n = parseInt(raw, 10);
   return Number.isFinite(n) ? n : 0;
 }
-
-function money(n) {
+function money(n){
   return (Number.isFinite(n) ? n : 0).toLocaleString(undefined, { style:"currency", currency:"USD" });
 }
-
-function fmt(n, digits=2) {
+function fmt(n, digits=2){
   return (Number.isFinite(n) ? n : 0).toFixed(digits);
 }
-
-function updateDiscountLabel() {
-  const d = parseNum(discount.value);
-  discountLabel.textContent = `${d}%`;
-  outDisc.textContent = `${d}`;
+function offerFromMelt(melt, discPct){
+  const d = (Number.isFinite(discPct) ? discPct : 0) / 100;
+  return melt * (1 - d);
 }
 
-// -------------------- Core calculation --------------------
-function calc() {
-  updateDiscountLabel();
+// ---------------- Label updates ----------------
+function updateLabels(){
+  d90Label.textContent = `${parseNum(disc90.value)}%`;
+  d40Label.textContent = `${parseNum(disc40.value)}%`;
+  dOZLabel.textContent = `${parseNum(discOz.value)}%`;
+  dRndLabel.textContent = `${parseNum(discRounds.value)}%`;
+  dAseLabel.textContent = `${parseNum(discAse.value)}%`;
+  dGoldLabel.textContent = `${parseNum(discGold.value)}%`;
+}
+
+// ---------------- Core calc ----------------
+function calc(){
+  updateLabels();
 
   const sSpot = parseNum(spotSilver.value);
   const gSpot = parseNum(spotGold.value);
-  const dPct  = parseNum(discount.value) / 100;
 
-  // ---- 90% FV ----
+  // ===== 90% bucket =====
   const halves90  = parseIntSafe(h90.value);
   const quarters90= parseIntSafe(q90.value);
   const dimes90   = parseIntSafe(d90.value);
+  const dollars90 = parseIntSafe(sd90.value);
 
   const fv90 =
     halves90   * 0.50 +
@@ -128,30 +147,78 @@ function calc() {
     dimes90    * 0.10;
 
   const aswPerDollar = use715.checked ? ASW_90_PER_DOLLAR_WORN : ASW_90_PER_DOLLAR_BU;
-  const asw90 = fv90 * aswPerDollar;
+  const asw90fv = fv90 * aswPerDollar;
+  const asw90d  = dollars90 * ASW_90_DOLLAR;
+  const asw90Total = asw90fv + asw90d;
 
-  // ---- 40% halves ----
+  const melt90 = asw90Total * sSpot;
+  const offer90 = offerFromMelt(melt90, parseNum(disc90.value));
+
+  outFV90.textContent = money(fv90);
+  outD90.textContent = `${dollars90}`;
+  outASW90FV.textContent = fmt(asw90fv, 2);
+  outASW90D.textContent  = fmt(asw90d, 2);
+  outMelt90.textContent  = money(melt90);
+  outOffer90.textContent = money(offer90);
+
+  // ===== 40% bucket =====
   const halves40 = parseIntSafe(h40.value);
-  const fv40 = halves40 * 0.50;
-  const asw40 = halves40 * ASW_40_HALF;
+  const dollars40= parseIntSafe(sd40.value);
 
-  // ---- Bullion silver ----
-  const roundsCount = parseIntSafe(rounds.value);
-  const aseCount = parseIntSafe(ase.value);
-  const bullionOz = (roundsCount + aseCount) * 1.0;
+  const fv40 = halves40 * 0.50; // only halves have FV here
+  const asw40h = halves40 * ASW_40_HALF;
+  const asw40d = dollars40 * ASW_40_IKE;
+  const asw40Total = asw40h + asw40d;
 
-  // ---- Other .999 silver oz ----
+  const melt40 = asw40Total * sSpot;
+  const offer40= offerFromMelt(melt40, parseNum(disc40.value));
+
+  outFV40.textContent = money(fv40);
+  outD40.textContent  = `${dollars40}`;
+  outASW40H.textContent = fmt(asw40h, 2);
+  outASW40D.textContent = fmt(asw40d, 2);
+  outMelt40.textContent = money(melt40);
+  outOffer40.textContent= money(offer40);
+
+  // ===== Other .999 oz bucket =====
   const ozOther = parseNum(ozOtherSilver.value);
+  const meltOz = ozOther * sSpot;
+  const offerOz= offerFromMelt(meltOz, parseNum(discOz.value));
 
-  // ---- Totals (silver) ----
-  const totalAsw = asw90 + asw40 + bullionOz + ozOther;
-  const silverMelt = totalAsw * sSpot;
+  outOzOther.textContent = fmt(ozOther, 2);
+  outMeltOz.textContent  = money(meltOz);
+  outOfferOz.textContent = money(offerOz);
 
-  // ---- Gold pre-33 ----
+  // ===== Rounds bucket =====
+  const roundsCount = parseIntSafe(rounds.value);
+  const rndOz = roundsCount * 1.0;
+  const meltRnd = rndOz * sSpot;
+  const offerRnd= offerFromMelt(meltRnd, parseNum(discRounds.value));
+
+  outRndOz.textContent = fmt(rndOz, 2);
+  outMeltRnd.textContent  = money(meltRnd);
+  outOfferRnd.textContent = money(offerRnd);
+
+  // ===== ASE bucket =====
+  const aseCount = parseIntSafe(ase.value);
+  const aseOz = aseCount * 1.0;
+  const meltAse = aseOz * sSpot;
+  const offerAse= offerFromMelt(meltAse, parseNum(discAse.value));
+
+  outAseOz.textContent = fmt(aseOz, 2);
+  outMeltAse.textContent  = money(meltAse);
+  outOfferAse.textContent = money(offerAse);
+
+  // ===== Gold bucket =====
   const c25 = parseIntSafe(g25.value);
   const c5  = parseIntSafe(g5.value);
   const c10 = parseIntSafe(g10.value);
   const c20 = parseIntSafe(g20.value);
+
+  const a10  = parseIntSafe(age10.value);
+  const a25  = parseIntSafe(age25.value);
+  const a50  = parseIntSafe(age50.value);
+  const a100 = parseIntSafe(age100.value);
 
   const agwPre33 =
     c25 * PRE33_AGW.g25 +
@@ -159,135 +226,150 @@ function calc() {
     c10 * PRE33_AGW.g10 +
     c20 * PRE33_AGW.g20;
 
-  // ---- Gold AGE ----
-  const a10  = parseIntSafe(age10.value);
-  const a25  = parseIntSafe(age25.value);
-  const a50  = parseIntSafe(age50.value);
-  const a100 = parseIntSafe(age100.value);
-
   const agwAge =
     a10  * AGE_AGW.age10 +
     a25  * AGE_AGW.age25 +
     a50  * AGE_AGW.age50 +
     a100 * AGE_AGW.age100;
 
-  const totalAgw = agwPre33 + agwAge;
-  const goldMelt = totalAgw * gSpot;
+  const goldOz = agwPre33 + agwAge;
+  const meltGold = goldOz * gSpot;
+  const offerGold= offerFromMelt(meltGold, parseNum(discGold.value));
 
-  // ---- Combined ----
-  const totalMelt = silverMelt + goldMelt;
-  const offer = totalMelt * (1 - dPct);
+  outGoldOz.textContent = fmt(goldOz, 5);
+  outMeltGold.textContent = money(meltGold);
+  outOfferGold.textContent= money(offerGold);
 
-  // ---- Output ----
-  const fvTotal = fv90 + fv40;
-  outFV90.textContent = money(fv90);
-  outFV40.textContent = money(fv40);
-  outFVTotal.textContent = money(fvTotal);
+  // ===== Grand totals =====
+  const totalMelt =
+    melt90 + melt40 + meltOz + meltRnd + meltAse + meltGold;
 
-  outBullionOz.textContent = fmt(bullionOz, 2);
-  outAsw.textContent = fmt(totalAsw, 2);
-  outSilverMelt.textContent = money(silverMelt);
+  const totalOffer =
+    offer90 + offer40 + offerOz + offerRnd + offerAse + offerGold;
 
-  outAgw.textContent = fmt(totalAgw, 5);
-  outGoldMelt.textContent = money(goldMelt);
-
-  outTotal.textContent = money(totalMelt);
-  outOffer.textContent = money(offer);
+  outTotalMelt.textContent = money(totalMelt);
+  outTotalOffer.textContent= money(totalOffer);
 
   if (sSpot === 0 && gSpot === 0) {
-    status.textContent = "Tip: enter spot prices for instant melt/offers. Works offline after first load.";
+    status.textContent = "Enter spot prices. Per-bucket discounts let you quote faster at the counter.";
   } else {
     status.textContent = "Ready.";
   }
 }
 
-// -------------------- Save/Load/Clear --------------------
-const STORAGE_KEY = "lotScannerState_v3";
+// ---------------- Save/Load/Clear ----------------
+const STORAGE_KEY = "lotScannerState_v4";
 
-function save() {
+function save(){
   const data = {
     spotSilver: spotSilver.value,
     spotGold: spotGold.value,
-    discount: discount.value,
     use715: use715.checked ? "1" : "0",
 
-    h90: h90.value, q90: q90.value, d90: d90.value,
-    h40: h40.value,
+    h90: h90.value, q90: q90.value, d90: d90.value, sd90: sd90.value,
+    h40: h40.value, sd40: sd40.value,
+
     ozOtherSilver: ozOtherSilver.value,
     rounds: rounds.value,
     ase: ase.value,
 
     g25: g25.value, g5: g5.value, g10: g10.value, g20: g20.value,
-    age10: age10.value, age25: age25.value, age50: age50.value, age100: age100.value
+    age10: age10.value, age25: age25.value, age50: age50.value, age100: age100.value,
+
+    disc90: disc90.value,
+    disc40: disc40.value,
+    discOz: discOz.value,
+    discRounds: discRounds.value,
+    discAse: discAse.value,
+    discGold: discGold.value
   };
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   status.textContent = "Saved to this iPhone.";
 }
 
-function load() {
+function load(){
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) { calc(); return; }
 
-  try {
+  try{
     const data = JSON.parse(raw);
 
     spotSilver.value = data.spotSilver || "";
-    spotGold.value = data.spotGold || "";
-    discount.value = data.discount || "0";
-    use715.checked = (data.use715 ?? "1") === "1";
+    spotGold.value   = data.spotGold || "";
+    use715.checked   = (data.use715 ?? "1") === "1";
 
-    h90.value = data.h90 ?? "";
-    q90.value = data.q90 ?? "";
-    d90.value = data.d90 ?? "";
-    h40.value = data.h40 ?? "";
+    h90.value  = data.h90 ?? "";
+    q90.value  = data.q90 ?? "";
+    d90.value  = data.d90 ?? "";
+    sd90.value = data.sd90 ?? "";
+
+    h40.value  = data.h40 ?? "";
+    sd40.value = data.sd40 ?? "";
+
     ozOtherSilver.value = data.ozOtherSilver ?? "";
     rounds.value = data.rounds ?? "";
-    ase.value = data.ase ?? "";
+    ase.value    = data.ase ?? "";
 
     g25.value = data.g25 ?? "";
     g5.value  = data.g5 ?? "";
     g10.value = data.g10 ?? "";
     g20.value = data.g20 ?? "";
+
     age10.value  = data.age10 ?? "";
     age25.value  = data.age25 ?? "";
     age50.value  = data.age50 ?? "";
     age100.value = data.age100 ?? "";
+
+    disc90.value    = data.disc90 ?? "0";
+    disc40.value    = data.disc40 ?? "0";
+    discOz.value    = data.discOz ?? "0";
+    discRounds.value= data.discRounds ?? "0";
+    discAse.value   = data.discAse ?? "0";
+    discGold.value  = data.discGold ?? "0";
   } catch {
-    // ignore parse errors; user can keep using app
+    // ignore
   }
 
   calc();
 }
 
-function clearCounts() {
-  // Clear only counts (leave spot + discount)
+function clearCounts(){
   [
-    h90, q90, d90, h40,
+    h90,q90,d90,sd90,
+    h40,sd40,
     ozOtherSilver, rounds, ase,
-    g25, g5, g10, g20,
-    age10, age25, age50, age100
+    g25,g5,g10,g20,
+    age10,age25,age50,age100
   ].forEach(x => x.value = "");
 
-  status.textContent = "Cleared counts (spots/discount kept).";
+  status.textContent = "Cleared counts (spots + discounts kept).";
   calc();
 }
 
-// -------------------- Events --------------------
-recalcInputs.forEach(inp => {
+// ---------------- Events ----------------
+[
+  spotSilver, spotGold, use715,
+  h90, q90, d90, sd90,
+  h40, sd40,
+  ozOtherSilver, rounds, ase,
+  g25, g5, g10, g20,
+  age10, age25, age50, age100,
+  disc90, disc40, discOz, discRounds, discAse, discGold
+].forEach(inp => {
   if (!inp) return;
   const evt = (inp === use715) ? "change" : "input";
   inp.addEventListener(evt, calc);
 });
 
-saveBtn.addEventListener("click", save);
-clearBtn.addEventListener("click", clearCounts);
-
-// iOS PWA focus helper (optional, harmless)
+// iOS PWA focus helper
 spotSilver.addEventListener("touchend", () => spotSilver.focus(), { passive:true });
 spotGold.addEventListener("touchend", () => spotGold.focus(), { passive:true });
 
-// Service worker (GitHub Pages safe: relative)
+saveBtn.addEventListener("click", save);
+clearBtn.addEventListener("click", clearCounts);
+
+// Service worker register (GitHub Pages safe)
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try { await navigator.serviceWorker.register("./sw.js"); }
@@ -296,4 +378,3 @@ if ("serviceWorker" in navigator) {
 }
 
 load();
-
