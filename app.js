@@ -1,4 +1,4 @@
-const APP_VERSION = "v7";
+const APP_VERSION = "v8";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -493,3 +493,4 @@ if ("serviceWorker" in navigator) {
 // Init
 loadState();
 renderQuotes();
+
