@@ -31,11 +31,11 @@
       <div class="grid2">
         <div>
           <label for="spotSilver">Silver spot ($/oz)</label>
-          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 85.00" />
+          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 119.00" />
         </div>
         <div>
           <label for="spotGold">Gold spot ($/oz)</label>
-          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 4850.00" />
+          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 5300.00" />
         </div>
       </div>
 
@@ -46,8 +46,19 @@
         </label>
       </div>
 
+      <div class="grid2">
+        <div>
+          <label for="lotName">Lot name (optional)</label>
+          <input id="lotName" type="text" inputmode="text" placeholder='e.g., "Estate box", "John @ 2:15pm"' />
+        </div>
+        <div class="hintBox muted small">
+          Tip: use lot name to find the quote later fast.
+        </div>
+      </div>
+
       <div class="actions">
         <button id="saveBtn" type="button">Save</button>
+        <button id="saveQuoteBtn" type="button">Save Quote</button>
         <button id="clearBtn" type="button" class="ghost">Clear counts</button>
       </div>
 
@@ -81,7 +92,7 @@
       </div>
 
       <div class="discount">
-        <input id="disc90" type="range" min="0" max="50" step="0.5" value="0" />
+        <input id="disc90" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -116,7 +127,7 @@
       </div>
 
       <div class="discount">
-        <input id="disc40" type="range" min="0" max="70" step="0.5" value="0" />
+        <input id="disc40" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -147,7 +158,7 @@
       </div>
 
       <div class="discount">
-        <input id="discOz" type="range" min="0" max="30" step="0.5" value="0" />
+        <input id="discOz" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -203,7 +214,7 @@
       </div>
 
       <div class="discount">
-        <input id="discAse" type="range" min="0" max="25" step="0.5" value="0" />
+        <input id="discAse" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -259,7 +270,7 @@
       </div>
 
       <div class="discount">
-        <input id="discGold" type="range" min="0" max="20" step="0.5" value="0" />
+        <input id="discGold" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -288,10 +299,22 @@
         This app is math only. It doesn’t include premium/numismatic value.
       </div>
     </section>
+
+    <!-- QUOTES -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>Saved quotes</h2>
+        <div class="actionsInline">
+          <button id="deleteAllQuotesBtn" type="button" class="ghost">Delete All</button>
+        </div>
+      </div>
+
+      <div id="quotesList" class="quotesList"></div>
+      <div class="muted small">Shows last 25 quotes saved on this iPhone.</div>
+    </section>
+
   </main>
 
   <script src="./app.js"></script>
 </body>
 </html>
-
-
