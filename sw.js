@@ -3,7 +3,7 @@ const CACHE = "quick-lot-scanner-v5";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=4",
+  "./styles.css?v=5",
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
@@ -29,4 +29,5 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
 
