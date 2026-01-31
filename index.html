@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="./styles.css?v=6" />
+  <link rel="stylesheet" href="./styles.css?v=8" />
 </head>
 
 <body>
@@ -21,7 +21,7 @@
         <h1>Quick Lot Scanner</h1>
         <p class="muted">Per-bucket discounts → fast offers. Offline.</p>
       </div>
-      <div id="version" class="version">v6</div>
+      <div id="version" class="version">v8</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -31,11 +31,11 @@
       <div class="grid2">
         <div>
           <label for="spotSilver">Silver spot ($/oz)</label>
-          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 119.00" />
+          <input id="spotSilver" type="text" inputmode="decimal" placeholder="e.g., 85.00" />
         </div>
         <div>
           <label for="spotGold">Gold spot ($/oz)</label>
-          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 5300.00" />
+          <input id="spotGold" type="text" inputmode="decimal" placeholder="e.g., 4800.00" />
         </div>
       </div>
 
@@ -92,7 +92,7 @@
       </div>
 
       <div class="discount">
-        <input id="disc90" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="disc90" type="range" min="0" max="50" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -127,7 +127,7 @@
       </div>
 
       <div class="discount">
-        <input id="disc40" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="disc40" type="range" min="0" max="70" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -158,7 +158,7 @@
       </div>
 
       <div class="discount">
-        <input id="discOz" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="discOz" type="range" min="0" max="30" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -186,7 +186,7 @@
       </div>
 
       <div class="discount">
-        <input id="discRounds" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="discRounds" type="range" min="0" max="30" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -214,7 +214,7 @@
       </div>
 
       <div class="discount">
-        <input id="discAse" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="discAse" type="range" min="0" max="25" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -270,7 +270,7 @@
       </div>
 
       <div class="discount">
-        <input id="discGold" type="range" min="0" max="10" step="0.5" value="0" />
+        <input id="discGold" type="range" min="0" max="20" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -296,7 +296,7 @@
       </div>
 
       <div class="muted small">
-        This app is math only. It doesn’t include premium/numismatic value.
+        This app is only for metal content. It doesn’t include premium/numismatic values. 
       </div>
     </section>
 
@@ -318,3 +318,4 @@
   <script src="./app.js"></script>
 </body>
 </html>
+
