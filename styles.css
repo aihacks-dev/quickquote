@@ -57,37 +57,34 @@ h2{ margin:0 0 10px; font-size:16px; }
 
 label{ font-weight:600; display:block; margin-bottom:6px; }
 
+/* ✅ text-like inputs only */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#0f0f13;
+  color:var(--fg);
+}
+
+/* ✅ checkbox sizing so label aligns properly */
+input[type="checkbox"], input[type="radio"]{
+  width:18px;
+  height:18px;
+  padding:0;
+  margin:0;
+  border-radius:4px;
+}
+
 .inline{
   display:flex;
   align-items:center;
-  gap:10px;              /* consistent small gap */
+  gap:10px;
   margin-top:10px;
   font-weight:600;
-  line-height: 1.2;
+  line-height:1.2;
 }
-
-
-/* Text-like inputs */
-input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: #0f0f13;
-  color: var(--fg);
-}
-
-/* Checkboxes/radios should NOT inherit the big input styling */
-input[type="checkbox"], input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  margin: 0;
-  border-radius: 4px;
-  accent-color: #8a8a8a; /* optional; safe */
-}
-
 
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
 .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
@@ -101,13 +98,8 @@ input[type="checkbox"], input[type="radio"] {
   .grid4{ grid-template-columns:1fr 1fr 1fr 1fr; }
 }
 
-.discount{
-  margin-top: 10px;
-}
-.discount input[type="range"]{
-  width:100%;
-  height:32px;
-}
+.discount{ margin-top:10px; }
+.discount input[type="range"]{ width:100%; height:32px; }
 
 .hintBox{
   border:1px dashed var(--line);
@@ -123,6 +115,11 @@ input[type="checkbox"], input[type="radio"] {
   gap:10px;
   margin-top:12px;
   flex-wrap:wrap;
+}
+
+.actionsInline{
+  display:flex;
+  gap:10px;
 }
 
 button{
@@ -160,9 +157,60 @@ button.ghost{ background:#14141a; }
 }
 .miniRow.big strong{ font-size: 17px; }
 
+.quotesList{
+  margin-top: 10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.quoteItem{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background:#0f0f13;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.quoteMeta{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width: 0;
+}
+
+.quoteTitle{
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.quoteSub{
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.quoteActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.quoteActions button{
+  padding:8px 10px;
+  font-size:14px;
+}
+
 .sep{
   border:0;
   border-top:1px solid var(--line);
   margin:10px 0;
 }
-
