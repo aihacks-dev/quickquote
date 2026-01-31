@@ -1,4 +1,4 @@
-const APP_VERSION = "v3";
+const APP_VERSION = "v4";
 
 // -------------------- Constants --------------------
 // 40% half dollar silver content (ASW, troy oz)
@@ -296,3 +296,4 @@ if ("serviceWorker" in navigator) {
 }
 
 load();
+
