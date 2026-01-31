@@ -59,21 +59,35 @@ label{ font-weight:600; display:block; margin-bottom:6px; }
 
 .inline{
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:10px;              /* consistent small gap */
   margin-top:10px;
   font-weight:600;
+  line-height: 1.2;
 }
 
-input{
-  width:100%;
-  padding:12px;
-  font-size:16px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:#0f0f13;
-  color:var(--fg);
+
+/* Text-like inputs */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #0f0f13;
+  color: var(--fg);
 }
+
+/* Checkboxes/radios should NOT inherit the big input styling */
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  border-radius: 4px;
+  accent-color: #8a8a8a; /* optional; safe */
+}
+
 
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
 .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
@@ -151,3 +165,4 @@ button.ghost{ background:#14141a; }
   border-top:1px solid var(--line);
   margin:10px 0;
 }
+
