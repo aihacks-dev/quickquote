@@ -1,9 +1,9 @@
-const CACHE = "quick-lot-scanner-v14";
+const CACHE = "quick-lot-scanner-v15";
 
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=14",
+  "./styles.css?v=15",
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
@@ -29,4 +29,5 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
 
