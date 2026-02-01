@@ -1,4 +1,4 @@
-const APP_VERSION = "v14";
+const APP_VERSION = "v15";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -185,15 +185,18 @@ function setPanelVisible(key, panel, btn, visible){
 function initToggleButtons(){
   const state = getToggleState();
 
-  // Ensure default is hidden
-  const map = {
-    resale90: resale90Panel,
-    resale40: resale40Panel,
-    resaleOz: resaleOzPanel,
-    resaleRnd: resaleRndPanel,
-    resaleAse: resaleAsePanel,
-    resaleGold: resaleGoldPanel
-  };
+const totalsResalePanel = document.getElementById("totalsResalePanel");
+
+const map = {
+  resale90: resale90Panel,
+  resale40: resale40Panel,
+  resaleOz: resaleOzPanel,
+  resaleRnd: resaleRndPanel,
+  resaleAse: resaleAsePanel,
+  resaleGold: resaleGoldPanel,
+  totalsResale: totalsResalePanel
+};
+
 
   document.querySelectorAll('button[data-toggle]').forEach(btn => {
     const key = btn.getAttribute("data-toggle");
@@ -621,4 +624,5 @@ loadState();
 initToggleButtons();
 renderQuotes();
 calc();
+
 
