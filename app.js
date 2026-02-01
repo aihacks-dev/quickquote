@@ -1,4 +1,4 @@
-const APP_VERSION = "v15";
+const APP_VERSION = "v16";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -14,7 +14,7 @@ const AGE_AGW   = { age10:0.10, age25:0.25, age50:0.50, age100:1.00 };
 
 const CHANNEL_DEFAULTS = {
   wholesale: 70.0,
-  refiner: 75,
+  refiner: 80.5,
   ebay: 85.0,
   public: 101.0
 };
@@ -99,13 +99,16 @@ const resaleRnd= el("resaleRnd"),sellPctRnd= el("sellPctRnd"),sellPctRndLabel= e
 const resaleAse= el("resaleAse"),sellPctAse= el("sellPctAse"),sellPctAseLabel= el("sellPctAseLabel");
 const resaleGold=el("resaleGold"),sellPctGold=el("sellPctGold"),sellPctGoldLabel=el("sellPctGoldLabel");
 
-// resale panels + toggle state (collapsed by default)
+// resale panels
 const resale90Panel = el("resale90Panel");
 const resale40Panel = el("resale40Panel");
 const resaleOzPanel = el("resaleOzPanel");
 const resaleRndPanel= el("resaleRndPanel");
 const resaleAsePanel= el("resaleAsePanel");
 const resaleGoldPanel=el("resaleGoldPanel");
+
+// totals resale panel
+const totalsResalePanel = el("totalsResalePanel");
 
 // Buttons / status
 const saveBtn = el("saveBtn");
@@ -177,17 +180,13 @@ function setToggleState(obj){
   localStorage.setItem(TOGGLE_KEY, JSON.stringify(obj));
 }
 
-function setPanelVisible(key, panel, btn, visible){
+function setPanelVisible(panel, btn, visible){
+  if (!panel) return;
   panel.classList.toggle("hidden", !visible);
-  btn.textContent = visible ? "Hide" : "Show";
+  if (btn) btn.textContent = visible ? "Hide" : "Show";
 }
 
-function initToggleButtons(){
-  const state = getToggleState();
-
-const totalsResalePanel = document.getElementById("totalsResalePanel");
-
-const map = {
+const TOGGLE_MAP = {
   resale90: resale90Panel,
   resale40: resale40Panel,
   resaleOz: resaleOzPanel,
@@ -197,22 +196,31 @@ const map = {
   totalsResale: totalsResalePanel
 };
 
-
+function syncAllToggleButtons(){
+  const state = getToggleState();
   document.querySelectorAll('button[data-toggle]').forEach(btn => {
     const key = btn.getAttribute("data-toggle");
-    const panel = map[key];
-    const visible = !!state[key]; // default false
-    if (panel) setPanelVisible(key, panel, btn, visible);
-
-    btn.addEventListener("click", () => {
-      const st = getToggleState();
-      const now = !st[key];
-      st[key] = now;
-      setToggleState(st);
-      setPanelVisible(key, panel, btn, now);
-    });
+    const panel = TOGGLE_MAP[key];
+    const visible = !!state[key];
+    setPanelVisible(panel, btn, visible);
   });
 }
+
+// Single delegated click handler (no double-binding)
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest('button[data-toggle]');
+  if (!btn) return;
+
+  const key = btn.getAttribute("data-toggle");
+  const panel = TOGGLE_MAP[key];
+  if (!panel) return;
+
+  const state = getToggleState();
+  const next = !state[key];
+  state[key] = next;
+  setToggleState(state);
+  setPanelVisible(panel, btn, next);
+});
 
 // ---------------- Channel behavior ----------------
 function applyChannelDefault(selectEl, rangeEl, labelEl){
@@ -432,7 +440,6 @@ function getStateSnapshot(){
     resaleAse: resaleAse.value, sellPctAse: sellPctAse.value,
     resaleGold: resaleGold.value, sellPctGold: sellPctGold.value,
 
-    // include toggle visibility so saved state restores your preference
     resaleVisible: getToggleState()
   };
 }
@@ -471,7 +478,6 @@ function applyStateSnapshot(s){
   resaleGold.value = s.resaleGold ?? "refiner";
   sellPctGold.value = s.sellPctGold ?? String(CHANNEL_DEFAULTS[resaleGold.value]);
 
-  // restore toggle visibility if present
   if (s.resaleVisible && typeof s.resaleVisible === "object") {
     setToggleState(s.resaleVisible);
   }
@@ -541,8 +547,8 @@ function loadQuote(id){
   if (!q) return;
   applyStateSnapshot(q.snapshot);
 
-  // re-init toggles based on restored toggle state
-  initToggleButtons(); // safe: rebinds buttons, but we’ll guard duplicates below
+  // after restoring toggle state, re-sync button text + panels
+  syncAllToggleButtons();
 
   calc();
   status.textContent = `Loaded quote: ${q.name ? q.name : fmtDate(q.ts)}`;
@@ -619,10 +625,8 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Init: load state, init toggles, render quotes, calc
+// Init
 loadState();
-initToggleButtons();
+syncAllToggleButtons();
 renderQuotes();
 calc();
-
-
