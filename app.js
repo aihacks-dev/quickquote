@@ -1,4 +1,4 @@
-const APP_VERSION = "v8";
+const APP_VERSION = "v9";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -12,91 +12,19 @@ const ASW_40_IKE = 0.31610;
 const PRE33_AGW = { g25:0.12094, g5:0.24187, g10:0.48375, g20:0.96750 };
 const AGE_AGW   = { age10:0.10, age25:0.25, age50:0.50, age100:1.00 };
 
+// Default sell % (of melt) by channel.
+// These are "net to you" expectations after spread/fees.
+// You can override per bucket with the slider.
+const CHANNEL_DEFAULTS = {
+  wholesale: 98.0,
+  refiner: 99.5,
+  ebay: 90.0,
+  public: 103.0
+};
+
 // ---------------- DOM helpers ----------------
 const el = (id) => document.getElementById(id);
 
-// Top inputs
-const spotSilver = el("spotSilver");
-const spotGold   = el("spotGold");
-const use715     = el("use715");
-const lotName    = el("lotName");
-
-// 90% inputs + slider + label
-const h90 = el("h90"), q90 = el("q90"), d90 = el("d90"), sd90 = el("sd90");
-const disc90 = el("disc90"); const d90Label = el("d90Label");
-
-// 40% inputs + slider + label
-const h40 = el("h40"), sd40 = el("sd40");
-const disc40 = el("disc40"); const d40Label = el("d40Label");
-
-// .999 oz
-const ozOtherSilver = el("ozOtherSilver");
-const discOz = el("discOz"); const dOZLabel = el("dOZLabel");
-
-// rounds
-const rounds = el("rounds");
-const discRounds = el("discRounds"); const dRndLabel = el("dRndLabel");
-
-// ASE
-const ase = el("ase");
-const discAse = el("discAse"); const dAseLabel = el("dAseLabel");
-
-// gold
-const g25 = el("g25"), g5 = el("g5"), g10 = el("g10"), g20 = el("g20");
-const age10 = el("age10"), age25 = el("age25"), age50 = el("age50"), age100 = el("age100");
-const discGold = el("discGold"); const dGoldLabel = el("dGoldLabel");
-
-// Buttons / status
-const saveBtn = el("saveBtn");
-const saveQuoteBtn = el("saveQuoteBtn");
-const clearBtn = el("clearBtn");
-const status = el("status");
-
-// Quotes UI
-const quotesList = el("quotesList");
-const deleteAllQuotesBtn = el("deleteAllQuotesBtn");
-
-// Outputs 90%
-const outFV90 = el("outFV90");
-const outD90  = el("outD90");
-const outASW90FV = el("outASW90FV");
-const outASW90D  = el("outASW90D");
-const outMelt90  = el("outMelt90");
-const outOffer90 = el("outOffer90");
-
-// Outputs 40%
-const outFV40 = el("outFV40");
-const outD40  = el("outD40");
-const outASW40H = el("outASW40H");
-const outASW40D = el("outASW40D");
-const outMelt40 = el("outMelt40");
-const outOffer40= el("outOffer40");
-
-// Outputs oz other
-const outOzOther = el("outOzOther");
-const outMeltOz  = el("outMeltOz");
-const outOfferOz = el("outOfferOz");
-
-// Outputs rounds
-const outRndOz = el("outRndOz");
-const outMeltRnd = el("outMeltRnd");
-const outOfferRnd= el("outOfferRnd");
-
-// Outputs ASE
-const outAseOz = el("outAseOz");
-const outMeltAse = el("outMeltAse");
-const outOfferAse= el("outOfferAse");
-
-// Outputs gold
-const outGoldOz = el("outGoldOz");
-const outMeltGold = el("outMeltGold");
-const outOfferGold= el("outOfferGold");
-
-// Totals
-const outTotalMelt = el("outTotalMelt");
-const outTotalOffer= el("outTotalOffer");
-
-// ---------------- Parsing/formatting ----------------
 function parseNum(v){
   const raw = (v || "").toString().replace(/[$,\s]/g, "").trim();
   const n = parseFloat(raw);
@@ -117,6 +45,15 @@ function offerFromMelt(melt, discPct){
   const d = (Number.isFinite(discPct) ? discPct : 0) / 100;
   return melt * (1 - d);
 }
+function sellFromMelt(melt, sellPct){
+  const p = (Number.isFinite(sellPct) ? sellPct : 0) / 100;
+  return melt * p;
+}
+function setProfitClass(node, value){
+  node.classList.remove("pos","neg");
+  if (value >= 0) node.classList.add("pos");
+  else node.classList.add("neg");
+}
 function fmtDate(ts){
   const d = new Date(ts);
   return new Intl.DateTimeFormat(undefined, {
@@ -124,9 +61,151 @@ function fmtDate(ts){
     hour: "2-digit", minute: "2-digit"
   }).format(d);
 }
+function escapeHtml(s){
+  return (s || "").toString()
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-// ---------------- Label updates ----------------
-function updateLabels(){
+// ---------------- Inputs ----------------
+const spotSilver = el("spotSilver");
+const spotGold   = el("spotGold");
+const use715     = el("use715");
+const lotName    = el("lotName");
+
+// 90% counts + discount
+const h90 = el("h90"), q90 = el("q90"), d90 = el("d90"), sd90 = el("sd90");
+const disc90 = el("disc90"); const d90Label = el("d90Label");
+
+// 40% counts + discount
+const h40 = el("h40"), sd40 = el("sd40");
+const disc40 = el("disc40"); const d40Label = el("d40Label");
+
+// .999 other oz + discount
+const ozOtherSilver = el("ozOtherSilver");
+const discOz = el("discOz"); const dOZLabel = el("dOZLabel");
+
+// rounds + discount
+const rounds = el("rounds");
+const discRounds = el("discRounds"); const dRndLabel = el("dRndLabel");
+
+// ASE + discount
+const ase = el("ase");
+const discAse = el("discAse"); const dAseLabel = el("dAseLabel");
+
+// gold + discount
+const g25 = el("g25"), g5 = el("g5"), g10 = el("g10"), g20 = el("g20");
+const age10 = el("age10"), age25 = el("age25"), age50 = el("age50"), age100 = el("age100");
+const discGold = el("discGold"); const dGoldLabel = el("dGoldLabel");
+
+// resale controls per bucket
+const resale90 = el("resale90"), sellPct90 = el("sellPct90"), sellPct90Label = el("sellPct90Label");
+const resale40 = el("resale40"), sellPct40 = el("sellPct40"), sellPct40Label = el("sellPct40Label");
+const resaleOz = el("resaleOz"), sellPctOz = el("sellPctOz"), sellPctOzLabel = el("sellPctOzLabel");
+const resaleRnd= el("resaleRnd"),sellPctRnd= el("sellPctRnd"),sellPctRndLabel= el("sellPctRndLabel");
+const resaleAse= el("resaleAse"),sellPctAse= el("sellPctAse"),sellPctAseLabel= el("sellPctAseLabel");
+const resaleGold=el("resaleGold"),sellPctGold=el("sellPctGold"),sellPctGoldLabel=el("sellPctGoldLabel");
+
+// Buttons / status
+const saveBtn = el("saveBtn");
+const saveQuoteBtn = el("saveQuoteBtn");
+const clearBtn = el("clearBtn");
+const status = el("status");
+
+// Quotes
+const quotesList = el("quotesList");
+const deleteAllQuotesBtn = el("deleteAllQuotesBtn");
+
+// ---------------- Outputs ----------------
+// 90
+const outFV90 = el("outFV90");
+const outD90  = el("outD90");
+const outASW90FV = el("outASW90FV");
+const outASW90D  = el("outASW90D");
+const outMelt90  = el("outMelt90");
+const outOffer90 = el("outOffer90");
+const outSell90  = el("outSell90");
+const outProfit90= el("outProfit90");
+
+// 40
+const outFV40 = el("outFV40");
+const outD40  = el("outD40");
+const outASW40H = el("outASW40H");
+const outASW40D = el("outASW40D");
+const outMelt40 = el("outMelt40");
+const outOffer40= el("outOffer40");
+const outSell40 = el("outSell40");
+const outProfit40=el("outProfit40");
+
+// oz
+const outOzOther = el("outOzOther");
+const outMeltOz  = el("outMeltOz");
+const outOfferOz = el("outOfferOz");
+const outSellOz  = el("outSellOz");
+const outProfitOz= el("outProfitOz");
+
+// rounds
+const outRndOz = el("outRndOz");
+const outMeltRnd = el("outMeltRnd");
+const outOfferRnd= el("outOfferRnd");
+const outSellRnd = el("outSellRnd");
+const outProfitRnd=el("outProfitRnd");
+
+// ase
+const outAseOz = el("outAseOz");
+const outMeltAse = el("outMeltAse");
+const outOfferAse= el("outOfferAse");
+const outSellAse = el("outSellAse");
+const outProfitAse=el("outProfitAse");
+
+// gold
+const outGoldOz = el("outGoldOz");
+const outMeltGold = el("outMeltGold");
+const outOfferGold= el("outOfferGold");
+const outSellGold = el("outSellGold");
+const outProfitGold=el("outProfitGold");
+
+// totals
+const outTotalMelt = el("outTotalMelt");
+const outTotalOffer= el("outTotalOffer");
+const outTotalSell = el("outTotalSell");
+const outTotalProfit = el("outTotalProfit");
+
+// ---------------- Channel behavior ----------------
+function applyChannelDefault(selectEl, rangeEl, labelEl){
+  const ch = selectEl.value;
+  const def = CHANNEL_DEFAULTS[ch] ?? 98.0;
+  rangeEl.value = String(def);
+  labelEl.textContent = `${fmt(def, 1)}%`;
+}
+function updateSellLabel(rangeEl, labelEl){
+  labelEl.textContent = `${fmt(parseNum(rangeEl.value), 1)}%`;
+}
+
+// When channel changes, snap slider to default
+[
+  [resale90, sellPct90, sellPct90Label],
+  [resale40, sellPct40, sellPct40Label],
+  [resaleOz, sellPctOz, sellPctOzLabel],
+  [resaleRnd, sellPctRnd, sellPctRndLabel],
+  [resaleAse, sellPctAse, sellPctAseLabel],
+  [resaleGold, sellPctGold, sellPctGoldLabel],
+].forEach(([sel, rng, lab]) => {
+  sel.addEventListener("change", () => {
+    applyChannelDefault(sel, rng, lab);
+    calc();
+  });
+  rng.addEventListener("input", () => {
+    updateSellLabel(rng, lab);
+    calc();
+  });
+});
+
+// ---------------- Discount labels ----------------
+function updateDiscountLabels(){
   d90Label.textContent = `${parseNum(disc90.value)}%`;
   d40Label.textContent = `${parseNum(disc40.value)}%`;
   dOZLabel.textContent = `${parseNum(discOz.value)}%`;
@@ -135,65 +214,20 @@ function updateLabels(){
   dGoldLabel.textContent = `${parseNum(discGold.value)}%`;
 }
 
-// ---------------- State snapshot ----------------
-function getStateSnapshot(){
-  return {
-    spotSilver: spotSilver.value,
-    spotGold: spotGold.value,
-    use715: use715.checked ? "1" : "0",
-    lotName: lotName.value,
-
-    h90: h90.value, q90: q90.value, d90: d90.value, sd90: sd90.value,
-    h40: h40.value, sd40: sd40.value,
-
-    ozOtherSilver: ozOtherSilver.value,
-    rounds: rounds.value,
-    ase: ase.value,
-
-    g25: g25.value, g5: g5.value, g10: g10.value, g20: g20.value,
-    age10: age10.value, age25: age25.value, age50: age50.value, age100: age100.value,
-
-    disc90: disc90.value,
-    disc40: disc40.value,
-    discOz: discOz.value,
-    discRounds: discRounds.value,
-    discAse: discAse.value,
-    discGold: discGold.value
-  };
-}
-
-function applyStateSnapshot(s){
-  spotSilver.value = s.spotSilver || "";
-  spotGold.value   = s.spotGold || "";
-  use715.checked   = (s.use715 ?? "1") === "1";
-  lotName.value    = s.lotName || "";
-
-  h90.value = s.h90 ?? ""; q90.value = s.q90 ?? ""; d90.value = s.d90 ?? ""; sd90.value = s.sd90 ?? "";
-  h40.value = s.h40 ?? ""; sd40.value = s.sd40 ?? "";
-
-  ozOtherSilver.value = s.ozOtherSilver ?? "";
-  rounds.value = s.rounds ?? "";
-  ase.value = s.ase ?? "";
-
-  g25.value = s.g25 ?? ""; g5.value = s.g5 ?? ""; g10.value = s.g10 ?? ""; g20.value = s.g20 ?? "";
-  age10.value = s.age10 ?? ""; age25.value = s.age25 ?? ""; age50.value = s.age50 ?? ""; age100.value = s.age100 ?? "";
-
-  disc90.value = s.disc90 ?? "0";
-  disc40.value = s.disc40 ?? "0";
-  discOz.value = s.discOz ?? "0";
-  discRounds.value = s.discRounds ?? "0";
-  discAse.value = s.discAse ?? "0";
-  discGold.value = s.discGold ?? "0";
-}
-
-// ---------------- Core calc ----------------
+// ---------------- Calc ----------------
 function calc(){
-  updateLabels();
+  updateDiscountLabels();
+  updateSellLabel(sellPct90, sellPct90Label);
+  updateSellLabel(sellPct40, sellPct40Label);
+  updateSellLabel(sellPctOz, sellPctOzLabel);
+  updateSellLabel(sellPctRnd, sellPctRndLabel);
+  updateSellLabel(sellPctAse, sellPctAseLabel);
+  updateSellLabel(sellPctGold, sellPctGoldLabel);
 
   const sSpot = parseNum(spotSilver.value);
   const gSpot = parseNum(spotGold.value);
 
-  // ===== 90% bucket =====
+  // ---- 90% bucket ----
   const halves90  = parseIntSafe(h90.value);
   const quarters90= parseIntSafe(q90.value);
   const dimes90   = parseIntSafe(d90.value);
@@ -211,6 +245,8 @@ function calc(){
   const asw90Total = asw90fv + asw90d;
   const melt90 = asw90Total * sSpot;
   const offer90 = offerFromMelt(melt90, parseNum(disc90.value));
+  const sell90 = sellFromMelt(melt90, parseNum(sellPct90.value));
+  const profit90 = sell90 - offer90;
 
   outFV90.textContent = money(fv90);
   outD90.textContent = `${dollars90}`;
@@ -218,8 +254,11 @@ function calc(){
   outASW90D.textContent  = fmt(asw90d, 2);
   outMelt90.textContent  = money(melt90);
   outOffer90.textContent = money(offer90);
+  outSell90.textContent  = money(sell90);
+  outProfit90.textContent= money(profit90);
+  setProfitClass(outProfit90, profit90);
 
-  // ===== 40% bucket =====
+  // ---- 40% bucket ----
   const halves40 = parseIntSafe(h40.value);
   const dollars40= parseIntSafe(sd40.value);
 
@@ -230,6 +269,8 @@ function calc(){
   const asw40Total = asw40h + asw40d;
   const melt40 = asw40Total * sSpot;
   const offer40= offerFromMelt(melt40, parseNum(disc40.value));
+  const sell40 = sellFromMelt(melt40, parseNum(sellPct40.value));
+  const profit40 = sell40 - offer40;
 
   outFV40.textContent = money(fv40);
   outD40.textContent  = `${dollars40}`;
@@ -237,37 +278,55 @@ function calc(){
   outASW40D.textContent = fmt(asw40d, 2);
   outMelt40.textContent = money(melt40);
   outOffer40.textContent= money(offer40);
+  outSell40.textContent  = money(sell40);
+  outProfit40.textContent= money(profit40);
+  setProfitClass(outProfit40, profit40);
 
-  // ===== Other .999 oz bucket =====
+  // ---- other .999 oz ----
   const ozOther = parseNum(ozOtherSilver.value);
   const meltOz = ozOther * sSpot;
   const offerOz= offerFromMelt(meltOz, parseNum(discOz.value));
+  const sellOz = sellFromMelt(meltOz, parseNum(sellPctOz.value));
+  const profitOz = sellOz - offerOz;
 
   outOzOther.textContent = fmt(ozOther, 2);
   outMeltOz.textContent  = money(meltOz);
   outOfferOz.textContent = money(offerOz);
+  outSellOz.textContent  = money(sellOz);
+  outProfitOz.textContent= money(profitOz);
+  setProfitClass(outProfitOz, profitOz);
 
-  // ===== Rounds bucket =====
+  // ---- rounds ----
   const roundsCount = parseIntSafe(rounds.value);
   const rndOz = roundsCount * 1.0;
   const meltRnd = rndOz * sSpot;
   const offerRnd= offerFromMelt(meltRnd, parseNum(discRounds.value));
+  const sellRnd = sellFromMelt(meltRnd, parseNum(sellPctRnd.value));
+  const profitRnd = sellRnd - offerRnd;
 
   outRndOz.textContent = fmt(rndOz, 2);
   outMeltRnd.textContent  = money(meltRnd);
   outOfferRnd.textContent = money(offerRnd);
+  outSellRnd.textContent  = money(sellRnd);
+  outProfitRnd.textContent= money(profitRnd);
+  setProfitClass(outProfitRnd, profitRnd);
 
-  // ===== ASE bucket =====
+  // ---- ASE ----
   const aseCount = parseIntSafe(ase.value);
   const aseOz = aseCount * 1.0;
   const meltAse = aseOz * sSpot;
   const offerAse= offerFromMelt(meltAse, parseNum(discAse.value));
+  const sellAse = sellFromMelt(meltAse, parseNum(sellPctAse.value));
+  const profitAse = sellAse - offerAse;
 
   outAseOz.textContent = fmt(aseOz, 2);
   outMeltAse.textContent  = money(meltAse);
   outOfferAse.textContent = money(offerAse);
+  outSellAse.textContent  = money(sellAse);
+  outProfitAse.textContent= money(profitAse);
+  setProfitClass(outProfitAse, profitAse);
 
-  // ===== Gold bucket =====
+  // ---- Gold ----
   const c25 = parseIntSafe(g25.value);
   const c5  = parseIntSafe(g5.value);
   const c10 = parseIntSafe(g10.value);
@@ -293,76 +352,131 @@ function calc(){
   const goldOz = agwPre33 + agwAge;
   const meltGold = goldOz * gSpot;
   const offerGold= offerFromMelt(meltGold, parseNum(discGold.value));
+  const sellGold = sellFromMelt(meltGold, parseNum(sellPctGold.value));
+  const profitGold = sellGold - offerGold;
 
   outGoldOz.textContent = fmt(goldOz, 5);
   outMeltGold.textContent = money(meltGold);
   outOfferGold.textContent= money(offerGold);
+  outSellGold.textContent  = money(sellGold);
+  outProfitGold.textContent= money(profitGold);
+  setProfitClass(outProfitGold, profitGold);
 
-  // ===== Grand totals =====
+  // ---- Totals ----
   const totalMelt = melt90 + melt40 + meltOz + meltRnd + meltAse + meltGold;
   const totalOffer = offer90 + offer40 + offerOz + offerRnd + offerAse + offerGold;
+  const totalSell  = sell90 + sell40 + sellOz + sellRnd + sellAse + sellGold;
+  const totalProfit= totalSell - totalOffer;
 
   outTotalMelt.textContent = money(totalMelt);
   outTotalOffer.textContent= money(totalOffer);
+  outTotalSell.textContent = money(totalSell);
+  outTotalProfit.textContent = money(totalProfit);
+  setProfitClass(outTotalProfit, totalProfit);
 
-  // Store last totals for quote saves (no DOM scraping)
-  window.__lastTotals = { totalMelt, totalOffer };
+  window.__lastTotals = { totalMelt, totalOffer, totalSell, totalProfit };
 
-  if (sSpot === 0 && gSpot === 0) status.textContent = "Enter spot prices. Per-bucket discounts let you quote faster.";
+  if (sSpot === 0 && gSpot === 0) status.textContent = "Enter spot prices. Resale % = your net expectation.";
   else status.textContent = "Ready.";
 }
 
-// ---------------- Calculator state save/load/clear ----------------
-const STATE_KEY = "lotScannerState_v6";
+// ---------------- State + Quotes ----------------
+const STATE_KEY = "lotScannerState_v7";
+const QUOTES_KEY = "lotScannerQuotes_v7";
+
+function getStateSnapshot(){
+  return {
+    spotSilver: spotSilver.value,
+    spotGold: spotGold.value,
+    use715: use715.checked ? "1" : "0",
+    lotName: lotName.value,
+
+    h90: h90.value, q90: q90.value, d90: d90.value, sd90: sd90.value,
+    h40: h40.value, sd40: sd40.value,
+    ozOtherSilver: ozOtherSilver.value,
+    rounds: rounds.value,
+    ase: ase.value,
+    g25: g25.value, g5: g5.value, g10: g10.value, g20: g20.value,
+    age10: age10.value, age25: age25.value, age50: age50.value, age100: age100.value,
+
+    disc90: disc90.value, disc40: disc40.value, discOz: discOz.value,
+    discRounds: discRounds.value, discAse: discAse.value, discGold: discGold.value,
+
+    resale90: resale90.value, sellPct90: sellPct90.value,
+    resale40: resale40.value, sellPct40: sellPct40.value,
+    resaleOz: resaleOz.value, sellPctOz: sellPctOz.value,
+    resaleRnd: resaleRnd.value, sellPctRnd: sellPctRnd.value,
+    resaleAse: resaleAse.value, sellPctAse: sellPctAse.value,
+    resaleGold: resaleGold.value, sellPctGold: sellPctGold.value
+  };
+}
+
+function applyStateSnapshot(s){
+  spotSilver.value = s.spotSilver || "";
+  spotGold.value   = s.spotGold || "";
+  use715.checked   = (s.use715 ?? "1") === "1";
+  lotName.value    = s.lotName || "";
+
+  h90.value = s.h90 ?? ""; q90.value = s.q90 ?? ""; d90.value = s.d90 ?? ""; sd90.value = s.sd90 ?? "";
+  h40.value = s.h40 ?? ""; sd40.value = s.sd40 ?? "";
+  ozOtherSilver.value = s.ozOtherSilver ?? "";
+  rounds.value = s.rounds ?? "";
+  ase.value = s.ase ?? "";
+
+  g25.value = s.g25 ?? ""; g5.value = s.g5 ?? ""; g10.value = s.g10 ?? ""; g20.value = s.g20 ?? "";
+  age10.value = s.age10 ?? ""; age25.value = s.age25 ?? ""; age50.value = s.age50 ?? ""; age100.value = s.age100 ?? "";
+
+  disc90.value = s.disc90 ?? "0";
+  disc40.value = s.disc40 ?? "0";
+  discOz.value = s.discOz ?? "0";
+  discRounds.value = s.discRounds ?? "0";
+  discAse.value = s.discAse ?? "0";
+  discGold.value = s.discGold ?? "0";
+
+  resale90.value = s.resale90 ?? "wholesale";
+  sellPct90.value = s.sellPct90 ?? String(CHANNEL_DEFAULTS[resale90.value]);
+  resale40.value = s.resale40 ?? "wholesale";
+  sellPct40.value = s.sellPct40 ?? String(CHANNEL_DEFAULTS[resale40.value]);
+  resaleOz.value = s.resaleOz ?? "refiner";
+  sellPctOz.value = s.sellPctOz ?? String(CHANNEL_DEFAULTS[resaleOz.value]);
+  resaleRnd.value = s.resaleRnd ?? "wholesale";
+  sellPctRnd.value = s.sellPctRnd ?? String(CHANNEL_DEFAULTS[resaleRnd.value]);
+  resaleAse.value = s.resaleAse ?? "wholesale";
+  sellPctAse.value = s.sellPctAse ?? String(CHANNEL_DEFAULTS[resaleAse.value]);
+  resaleGold.value = s.resaleGold ?? "refiner";
+  sellPctGold.value = s.sellPctGold ?? String(CHANNEL_DEFAULTS[resaleGold.value]);
+}
 
 function saveState(){
   localStorage.setItem(STATE_KEY, JSON.stringify(getStateSnapshot()));
   status.textContent = "Saved to this iPhone.";
 }
-
 function loadState(){
   const raw = localStorage.getItem(STATE_KEY);
-  if (raw) {
-    try { applyStateSnapshot(JSON.parse(raw)); } catch {}
-  }
+  if (raw) { try { applyStateSnapshot(JSON.parse(raw)); } catch {} }
+  // ensure labels show correctly
   calc();
 }
 
 function clearCounts(){
-  [
-    h90,q90,d90,sd90,
-    h40,sd40,
-    ozOtherSilver, rounds, ase,
-    g25,g5,g10,g20,
-    age10,age25,age50,age100
-  ].forEach(x => x.value = "");
-  status.textContent = "Cleared counts (spots + discounts kept).";
+  [h90,q90,d90,sd90,h40,sd40,ozOtherSilver,rounds,ase,g25,g5,g10,g20,age10,age25,age50,age100]
+    .forEach(x => x.value = "");
+  status.textContent = "Cleared counts (spots + sliders kept).";
   calc();
 }
 
-// ---------------- Quotes: Save/list/load/delete ----------------
-const QUOTES_KEY = "lotScannerQuotes_v6";
-
+// Quotes storage
 function getQuotes(){
   const raw = localStorage.getItem(QUOTES_KEY);
   if (!raw) return [];
-  try {
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  } catch {
-    return [];
-  }
+  try { const arr = JSON.parse(raw); return Array.isArray(arr) ? arr : []; }
+  catch { return []; }
 }
-
-function setQuotes(arr){
-  localStorage.setItem(QUOTES_KEY, JSON.stringify(arr.slice(0, 25)));
-}
+function setQuotes(arr){ localStorage.setItem(QUOTES_KEY, JSON.stringify(arr.slice(0,25))); }
 
 function saveQuote(){
-  // Ensure totals are current
   calc();
-
-  const totals = window.__lastTotals || { totalMelt: 0, totalOffer: 0 };
+  const totals = window.__lastTotals || { totalMelt:0, totalOffer:0, totalSell:0, totalProfit:0 };
   const snapshot = getStateSnapshot();
 
   const quote = {
@@ -371,6 +485,8 @@ function saveQuote(){
     name: (snapshot.lotName || "").trim(),
     totalOffer: totals.totalOffer,
     totalMelt: totals.totalMelt,
+    totalSell: totals.totalSell,
+    totalProfit: totals.totalProfit,
     snapshot
   };
 
@@ -383,25 +499,19 @@ function saveQuote(){
 }
 
 function deleteQuote(id){
-  const quotes = getQuotes().filter(q => q.id !== id);
-  setQuotes(quotes);
+  setQuotes(getQuotes().filter(q => q.id !== id));
   renderQuotes();
 }
-
 function deleteAllQuotes(){
   localStorage.removeItem(QUOTES_KEY);
   renderQuotes();
   status.textContent = "All quotes deleted.";
 }
-
 function loadQuote(id){
-  const quotes = getQuotes();
-  const q = quotes.find(x => x.id === id);
+  const q = getQuotes().find(x => x.id === id);
   if (!q) return;
-
   applyStateSnapshot(q.snapshot);
   calc();
-
   status.textContent = `Loaded quote: ${q.name ? q.name : fmtDate(q.ts)}`;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -415,8 +525,7 @@ function renderQuotes(){
 
   quotesList.innerHTML = quotes.map(q => {
     const title = q.name ? q.name : "Untitled lot";
-    const sub = `${fmtDate(q.ts)} • Offer ${money(q.totalOffer)} • Melt ${money(q.totalMelt)}`;
-
+    const sub = `${fmtDate(q.ts)} • Offer ${money(q.totalOffer)} • Profit ${money(q.totalProfit)}`;
     return `
       <div class="quoteItem" data-id="${q.id}">
         <div class="quoteMeta">
@@ -432,17 +541,7 @@ function renderQuotes(){
   }).join("");
 }
 
-// Simple HTML escape for user-provided lot names
-function escapeHtml(s){
-  return (s || "").toString()
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-// Quotes click handling (tap row to load; buttons override)
+// Quotes click handling
 quotesList.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (btn && btn.dataset && btn.dataset.action) {
@@ -452,11 +551,8 @@ quotesList.addEventListener("click", (e) => {
     return;
   }
   const item = e.target.closest(".quoteItem");
-  if (item && item.dataset && item.dataset.id) {
-    loadQuote(item.dataset.id);
-  }
+  if (item && item.dataset && item.dataset.id) loadQuote(item.dataset.id);
 });
-
 deleteAllQuotesBtn.addEventListener("click", deleteAllQuotes);
 
 // ---------------- Events ----------------
@@ -474,15 +570,16 @@ deleteAllQuotesBtn.addEventListener("click", deleteAllQuotes);
   inp.addEventListener(evt, calc);
 });
 
-// iOS PWA focus helper
+// iOS focus helper
 spotSilver.addEventListener("touchend", () => spotSilver.focus(), { passive:true });
 spotGold.addEventListener("touchend", () => spotGold.focus(), { passive:true });
 
+// Buttons
 saveBtn.addEventListener("click", saveState);
 saveQuoteBtn.addEventListener("click", saveQuote);
 clearBtn.addEventListener("click", clearCounts);
 
-// Service worker register (GitHub Pages safe)
+// Service worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try { await navigator.serviceWorker.register("./sw.js"); }
@@ -490,7 +587,24 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Init
-loadState();
-renderQuotes();
+// init defaults for sell % labels (first load)
+function initResaleDefaultsIfEmpty(){
+  // If sliders have empty/zero due to old state, set based on channel.
+  const pairs = [
+    [resale90, sellPct90, sellPct90Label],
+    [resale40, sellPct40, sellPct40Label],
+    [resaleOz, sellPctOz, sellPctOzLabel],
+    [resaleRnd, sellPctRnd, sellPctRndLabel],
+    [resaleAse, sellPctAse, sellPctAseLabel],
+    [resaleGold, sellPctGold, sellPctGoldLabel],
+  ];
+  pairs.forEach(([sel,rng,lab]) => {
+    if (!rng.value || parseNum(rng.value) === 0) applyChannelDefault(sel,rng,lab);
+    else updateSellLabel(rng,lab);
+  });
+}
 
+loadState();
+initResaleDefaultsIfEmpty();
+renderQuotes();
+calc();
