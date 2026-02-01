@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="./styles.css?v=8" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
 </head>
 
 <body>
@@ -19,9 +19,9 @@
     <header class="top">
       <div>
         <h1>Quick Lot Scanner</h1>
-        <p class="muted">Per-bucket discounts → fast offers. Offline.</p>
+        <p class="muted">Per-bucket discounts + resale check → safe quotes. Offline.</p>
       </div>
-      <div id="version" class="version">v8</div>
+      <div id="version" class="version">v9</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -92,7 +92,7 @@
       </div>
 
       <div class="discount">
-        <input id="disc90" type="range" min="0" max="50" step="0.5" value="0" />
+        <input id="disc90" type="range" min="0" max="60" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -102,6 +102,29 @@
         <div class="miniRow"><span>ASW oz (90% dollars)</span><strong id="outASW90D">0.00</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMelt90">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOffer90">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resale90">Sell to</label>
+              <select id="resale90" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPct90">Expected sell (% of melt): <span id="sellPct90Label" class="muted"></span></label>
+              <input id="sellPct90" type="range" min="70" max="110" step="0.5" value="98" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSell90">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfit90" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -137,6 +160,29 @@
         <div class="miniRow"><span>ASW oz (40% dollars)</span><strong id="outASW40D">0.00</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMelt40">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOffer40">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resale40">Sell to</label>
+              <select id="resale40" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPct40">Expected sell (% of melt): <span id="sellPct40Label" class="muted"></span></label>
+              <input id="sellPct40" type="range" min="40" max="110" step="0.5" value="98" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSell40">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfit40" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -165,6 +211,29 @@
         <div class="miniRow"><span>Ounces</span><strong id="outOzOther">0.00</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMeltOz">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOfferOz">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resaleOz">Sell to</label>
+              <select id="resaleOz" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPctOz">Expected sell (% of melt): <span id="sellPctOzLabel" class="muted"></span></label>
+              <input id="sellPctOz" type="range" min="70" max="110" step="0.5" value="99.5" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSellOz">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfitOz" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -193,6 +262,29 @@
         <div class="miniRow"><span>Ounces</span><strong id="outRndOz">0.00</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMeltRnd">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOfferRnd">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resaleRnd">Sell to</label>
+              <select id="resaleRnd" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPctRnd">Expected sell (% of melt): <span id="sellPctRndLabel" class="muted"></span></label>
+              <input id="sellPctRnd" type="range" min="70" max="110" step="0.5" value="99" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSellRnd">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfitRnd" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -221,6 +313,29 @@
         <div class="miniRow"><span>Ounces</span><strong id="outAseOz">0.00</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMeltAse">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOfferAse">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resaleAse">Sell to</label>
+              <select id="resaleAse" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPctAse">Expected sell (% of melt): <span id="sellPctAseLabel" class="muted"></span></label>
+              <input id="sellPctAse" type="range" min="70" max="110" step="0.5" value="99" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSellAse">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfitAse" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -277,6 +392,29 @@
         <div class="miniRow"><span>AGW oz</span><strong id="outGoldOz">0.00000</strong></div>
         <div class="miniRow"><span>Melt</span><strong id="outMeltGold">$0.00</strong></div>
         <div class="miniRow big"><span>Offer</span><strong id="outOfferGold">$0.00</strong></div>
+
+        <div class="resale">
+          <div class="resaleHead">Behind scenes: resale check</div>
+
+          <div class="grid2">
+            <div>
+              <label for="resaleGold">Sell to</label>
+              <select id="resaleGold" class="select">
+                <option value="wholesale">Wholesale</option>
+                <option value="refiner">Refiner</option>
+                <option value="ebay">eBay</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+            <div>
+              <label for="sellPctGold">Expected sell (% of melt): <span id="sellPctGoldLabel" class="muted"></span></label>
+              <input id="sellPctGold" type="range" min="80" max="110" step="0.5" value="99.5" />
+            </div>
+          </div>
+
+          <div class="miniRow"><span>Expected sell</span><strong id="outSellGold">$0.00</strong></div>
+          <div class="miniRow"><span>Profit</span><strong id="outProfitGold" class="profit">$0.00</strong></div>
+        </div>
       </div>
     </section>
 
@@ -293,10 +431,21 @@
           <span>Total offer (bucket discounts)</span>
           <strong id="outTotalOffer">$0.00</strong>
         </div>
+
+        <hr class="sep" />
+
+        <div class="resultRow big">
+          <span>Total expected sell</span>
+          <strong id="outTotalSell">$0.00</strong>
+        </div>
+        <div class="resultRow big">
+          <span>Total profit (sell − offer)</span>
+          <strong id="outTotalProfit" class="profit">$0.00</strong>
+        </div>
       </div>
 
       <div class="muted small">
-        This app is only for metal content. It doesn’t include premium/numismatic values. 
+        “Sell %” is your net expectation after fees/spread. Adjust the sliders to match reality.
       </div>
     </section>
 
@@ -318,4 +467,3 @@
   <script src="./app.js"></script>
 </body>
 </html>
-
