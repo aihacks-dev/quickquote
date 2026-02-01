@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="./styles.css?v=8" />
+  <link rel="stylesheet" href="./styles.css?v=12" />
 </head>
 
 <body>
@@ -21,7 +21,7 @@
         <h1>Quick Lot Scanner</h1>
         <p class="muted">Customer clean by default. Toggle behind-scenes when needed. Offline.</p>
       </div>
-      <div id="version" class="version">v8</div>
+      <div id="version" class="version">v12</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -122,7 +122,7 @@
               </div>
               <div>
                 <label for="sellPct90">Expected sell (% of melt): <span id="sellPct90Label" class="muted"></span></label>
-                <input id="sellPct90" type="range" min="70" max="110" step="0.5" value="98" />
+                <input id="sellPct90" type="range" min="70" max="110" step="0.5" value="65" />
               </div>
             </div>
 
@@ -186,7 +186,7 @@
               </div>
               <div>
                 <label for="sellPct40">Expected sell (% of melt): <span id="sellPct40Label" class="muted"></span></label>
-                <input id="sellPct40" type="range" min="70" max="110" step="0.5" value="98" />
+                <input id="sellPct40" type="range" min="70" max="110" step="0.5" value="60" />
               </div>
             </div>
 
@@ -243,7 +243,7 @@
               </div>
               <div>
                 <label for="sellPctOz">Expected sell (% of melt): <span id="sellPctOzLabel" class="muted"></span></label>
-                <input id="sellPctOz" type="range" min="70" max="110" step="0.5" value="99.5" />
+                <input id="sellPctOz" type="range" min="70" max="110" step="0.5" value="80" />
               </div>
             </div>
 
@@ -300,7 +300,7 @@
               </div>
               <div>
                 <label for="sellPctRnd">Expected sell (% of melt): <span id="sellPctRndLabel" class="muted"></span></label>
-                <input id="sellPctRnd" type="range" min="70" max="110" step="0.5" value="99" />
+                <input id="sellPctRnd" type="range" min="70" max="110" step="0.5" value="80" />
               </div>
             </div>
 
@@ -357,7 +357,7 @@
               </div>
               <div>
                 <label for="sellPctAse">Expected sell (% of melt): <span id="sellPctAseLabel" class="muted"></span></label>
-                <input id="sellPctAse" type="range" min="70" max="110" step="0.5" value="99" />
+                <input id="sellPctAse" type="range" min="70" max="110" step="0.5" value="85" />
               </div>
             </div>
 
@@ -503,3 +503,4 @@
   <script src="./app.js"></script>
 </body>
 </html>
+
