@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="./styles.css?v=16" />
+  <link rel="stylesheet" href="./styles.css?v=17" />
 </head>
 
 <body>
@@ -19,9 +19,9 @@
     <header class="top">
       <div>
         <h1>Quick Lot Scanner</h1>
-        <p class="muted">Customer quotes. Offline mode supported.</p>
+        <p class="muted">Customer quotes. Offline supported.</p>
       </div>
-      <div id="version" class="version">v16</div>
+      <div id="version" class="version">v17</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -86,7 +86,7 @@
           <input id="d90" type="text" inputmode="numeric" placeholder="0" />
         </div>
         <div>
-          <label for="sd90">90% $1 dollars (count)</label>
+          <label for="sd90">90% $1 dollars (Morgan/Peace) (count)</label>
           <input id="sd90" type="text" inputmode="numeric" placeholder="0" />
         </div>
       </div>
@@ -122,7 +122,7 @@
               </div>
               <div>
                 <label for="sellPct90">Expected sell (% of melt): <span id="sellPct90Label" class="muted"></span></label>
-                <input id="sellPct90" type="range" min="70" max="110" step="0.5" value="65" />
+                <input id="sellPct90" type="range" min="50" max="105" step="0.5" value="60" />
               </div>
             </div>
 
@@ -130,7 +130,6 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfit90" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -186,7 +185,7 @@
               </div>
               <div>
                 <label for="sellPct40">Expected sell (% of melt): <span id="sellPct40Label" class="muted"></span></label>
-                <input id="sellPct40" type="range" min="70" max="110" step="0.5" value="60" />
+                <input id="sellPct40" type="range" min="30" max="80" step="0.5" value="30" />
               </div>
             </div>
 
@@ -194,7 +193,6 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfit40" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -216,7 +214,7 @@
       </div>
 
       <div class="discount">
-        <input id="discOz" type="range" min="0" max="35" step="0.5" value="0" />
+        <input id="discOz" type="range" min="0" max="30" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -243,7 +241,7 @@
               </div>
               <div>
                 <label for="sellPctOz">Expected sell (% of melt): <span id="sellPctOzLabel" class="muted"></span></label>
-                <input id="sellPctOz" type="range" min="70" max="110" step="0.5" value="80" />
+                <input id="sellPctOz" type="range" min="60" max="110" step="0.5" value="80" />
               </div>
             </div>
 
@@ -251,7 +249,6 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfitOz" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -273,7 +270,7 @@
       </div>
 
       <div class="discount">
-        <input id="discRounds" type="range" min="0" max="35" step="0.5" value="0" />
+        <input id="discRounds" type="range" min="0" max="40" step="0.5" value="15" />
       </div>
 
       <div class="miniResults">
@@ -300,7 +297,7 @@
               </div>
               <div>
                 <label for="sellPctRnd">Expected sell (% of melt): <span id="sellPctRndLabel" class="muted"></span></label>
-                <input id="sellPctRnd" type="range" min="70" max="110" step="0.5" value="80" />
+                <input id="sellPctRnd" type="range" min="60" max="105" step="0.5" value="85" />
               </div>
             </div>
 
@@ -308,7 +305,6 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfitRnd" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -330,7 +326,7 @@
       </div>
 
       <div class="discount">
-        <input id="discAse" type="range" min="0" max="30" step="0.5" value="0" />
+        <input id="discAse" type="range" min="0" max="10" step="0.5" value="0" />
       </div>
 
       <div class="miniResults">
@@ -357,7 +353,7 @@
               </div>
               <div>
                 <label for="sellPctAse">Expected sell (% of melt): <span id="sellPctAseLabel" class="muted"></span></label>
-                <input id="sellPctAse" type="range" min="70" max="110" step="0.5" value="85" />
+                <input id="sellPctAse" type="range" min="65" max="110" step="0.5" value="85" />
               </div>
             </div>
 
@@ -365,7 +361,6 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfitAse" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -415,7 +410,7 @@
       </div>
 
       <div class="discount">
-        <input id="discGold" type="range" min="0" max="20" step="0.5" value="0" />
+        <input id="discGold" type="range" min="0" max="15" step="0.5" value="10" />
       </div>
 
       <div class="miniResults">
@@ -442,7 +437,7 @@
               </div>
               <div>
                 <label for="sellPctGold">Expected sell (% of melt): <span id="sellPctGoldLabel" class="muted"></span></label>
-                <input id="sellPctGold" type="range" min="70" max="110" step="0.5" value="99.5" />
+                <input id="sellPctGold" type="range" min="70" max="110" step="0.5" value="90" />
               </div>
             </div>
 
@@ -450,46 +445,44 @@
             <div class="miniRow"><span>Profit</span><strong id="outProfitGold" class="profit">$0.00</strong></div>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- TOTALS -->
-  <section class="panel">
-  <div class="panelHead">
-    <h2>Grand totals</h2>
-    <button type="button" class="miniBtn ghost" data-toggle="totalsResale">Show</button>
-  </div>
-
-  <div class="results">
-    <div class="resultRow big">
-      <span>Total melt</span>
-      <strong id="outTotalMelt">$0.00</strong>
-    </div>
-    <div class="resultRow big">
-      <span>Total offer (bucket discounts)</span>
-      <strong id="outTotalOffer">$0.00</strong>
-    </div>
-
-    <div id="totalsResalePanel" class="hidden">
-      <hr class="sep" />
-
-      <div class="resultRow big">
-        <span>Total expected sell</span>
-        <strong id="outTotalSell">$0.00</strong>
+    <!-- TOTALS (customer clean by default) -->
+    <section class="panel">
+      <div class="panelHead">
+        <h2>Grand totals</h2>
+        <button type="button" class="miniBtn ghost" data-toggle="totalsResale">Show</button>
       </div>
-      <div class="resultRow big">
-        <span>Total profit (sell − offer)</span>
-        <strong id="outTotalProfit" class="profit">$0.00</strong>
+
+      <div class="results">
+        <div class="resultRow big">
+          <span>Total melt</span>
+          <strong id="outTotalMelt">$0.00</strong>
+        </div>
+        <div class="resultRow big">
+          <span>Total offer (bucket discounts)</span>
+          <strong id="outTotalOffer">$0.00</strong>
+        </div>
+
+        <div id="totalsResalePanel" class="hidden">
+          <hr class="sep" />
+
+          <div class="resultRow big">
+            <span>Total expected sell</span>
+            <strong id="outTotalSell">$0.00</strong>
+          </div>
+          <div class="resultRow big">
+            <span>Total profit (sell − offer)</span>
+            <strong id="outTotalProfit" class="profit">$0.00</strong>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="muted small">
-    Totals resale/profit are hidden by default for customer view.
-  </div>
-</section>
-
+      <div class="muted small">
+        Totals resale/profit are hidden by default for customer view.
+      </div>
+    </section>
 
     <!-- QUOTES -->
     <section class="panel">
@@ -509,9 +502,3 @@
   <script src="./app.js"></script>
 </body>
 </html>
-
-
-
-
-
-
