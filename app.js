@@ -1,4 +1,4 @@
-const APP_VERSION = "v11";
+const APP_VERSION = "v12";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -12,17 +12,13 @@ const ASW_40_IKE = 0.31610;
 const PRE33_AGW = { g25:0.12094, g5:0.24187, g10:0.48375, g20:0.96750 };
 const AGE_AGW   = { age10:0.10, age25:0.25, age50:0.50, age100:1.00 };
 
-// Default sell % (of melt) by channel.
-// These are "net to you" expectations after spread/fees.
-// You can override per bucket with the slider.
 const CHANNEL_DEFAULTS = {
-  wholesale: 80.0,
-  refiner: 80,
+  wholesale: 70.0,
+  refiner: 75,
   ebay: 85.0,
-  public: 102.0
+  public: 101.0
 };
 
-// ---------------- DOM helpers ----------------
 const el = (id) => document.getElementById(id);
 
 function parseNum(v){
@@ -76,38 +72,40 @@ const spotGold   = el("spotGold");
 const use715     = el("use715");
 const lotName    = el("lotName");
 
-// 90% counts + discount
 const h90 = el("h90"), q90 = el("q90"), d90 = el("d90"), sd90 = el("sd90");
 const disc90 = el("disc90"); const d90Label = el("d90Label");
 
-// 40% counts + discount
 const h40 = el("h40"), sd40 = el("sd40");
 const disc40 = el("disc40"); const d40Label = el("d40Label");
 
-// .999 other oz + discount
 const ozOtherSilver = el("ozOtherSilver");
 const discOz = el("discOz"); const dOZLabel = el("dOZLabel");
 
-// rounds + discount
 const rounds = el("rounds");
 const discRounds = el("discRounds"); const dRndLabel = el("dRndLabel");
 
-// ASE + discount
 const ase = el("ase");
 const discAse = el("discAse"); const dAseLabel = el("dAseLabel");
 
-// gold + discount
 const g25 = el("g25"), g5 = el("g5"), g10 = el("g10"), g20 = el("g20");
 const age10 = el("age10"), age25 = el("age25"), age50 = el("age50"), age100 = el("age100");
 const discGold = el("discGold"); const dGoldLabel = el("dGoldLabel");
 
-// resale controls per bucket
+// resale controls
 const resale90 = el("resale90"), sellPct90 = el("sellPct90"), sellPct90Label = el("sellPct90Label");
 const resale40 = el("resale40"), sellPct40 = el("sellPct40"), sellPct40Label = el("sellPct40Label");
 const resaleOz = el("resaleOz"), sellPctOz = el("sellPctOz"), sellPctOzLabel = el("sellPctOzLabel");
 const resaleRnd= el("resaleRnd"),sellPctRnd= el("sellPctRnd"),sellPctRndLabel= el("sellPctRndLabel");
 const resaleAse= el("resaleAse"),sellPctAse= el("sellPctAse"),sellPctAseLabel= el("sellPctAseLabel");
 const resaleGold=el("resaleGold"),sellPctGold=el("sellPctGold"),sellPctGoldLabel=el("sellPctGoldLabel");
+
+// resale panels + toggle state (collapsed by default)
+const resale90Panel = el("resale90Panel");
+const resale40Panel = el("resale40Panel");
+const resaleOzPanel = el("resaleOzPanel");
+const resaleRndPanel= el("resaleRndPanel");
+const resaleAsePanel= el("resaleAsePanel");
+const resaleGoldPanel=el("resaleGoldPanel");
 
 // Buttons / status
 const saveBtn = el("saveBtn");
@@ -120,7 +118,6 @@ const quotesList = el("quotesList");
 const deleteAllQuotesBtn = el("deleteAllQuotesBtn");
 
 // ---------------- Outputs ----------------
-// 90
 const outFV90 = el("outFV90");
 const outD90  = el("outD90");
 const outASW90FV = el("outASW90FV");
@@ -130,7 +127,6 @@ const outOffer90 = el("outOffer90");
 const outSell90  = el("outSell90");
 const outProfit90= el("outProfit90");
 
-// 40
 const outFV40 = el("outFV40");
 const outD40  = el("outD40");
 const outASW40H = el("outASW40H");
@@ -140,39 +136,80 @@ const outOffer40= el("outOffer40");
 const outSell40 = el("outSell40");
 const outProfit40=el("outProfit40");
 
-// oz
 const outOzOther = el("outOzOther");
 const outMeltOz  = el("outMeltOz");
 const outOfferOz = el("outOfferOz");
 const outSellOz  = el("outSellOz");
 const outProfitOz= el("outProfitOz");
 
-// rounds
 const outRndOz = el("outRndOz");
 const outMeltRnd = el("outMeltRnd");
 const outOfferRnd= el("outOfferRnd");
 const outSellRnd = el("outSellRnd");
 const outProfitRnd=el("outProfitRnd");
 
-// ase
 const outAseOz = el("outAseOz");
 const outMeltAse = el("outMeltAse");
 const outOfferAse= el("outOfferAse");
 const outSellAse = el("outSellAse");
 const outProfitAse=el("outProfitAse");
 
-// gold
 const outGoldOz = el("outGoldOz");
 const outMeltGold = el("outMeltGold");
 const outOfferGold= el("outOfferGold");
 const outSellGold = el("outSellGold");
 const outProfitGold=el("outProfitGold");
 
-// totals
 const outTotalMelt = el("outTotalMelt");
 const outTotalOffer= el("outTotalOffer");
 const outTotalSell = el("outTotalSell");
 const outTotalProfit = el("outTotalProfit");
+
+// ---------------- Behind-scenes toggles ----------------
+const TOGGLE_KEY = "lotScannerResaleVisible_v8";
+
+function getToggleState(){
+  const raw = localStorage.getItem(TOGGLE_KEY);
+  if (!raw) return {};
+  try { return JSON.parse(raw) || {}; } catch { return {}; }
+}
+function setToggleState(obj){
+  localStorage.setItem(TOGGLE_KEY, JSON.stringify(obj));
+}
+
+function setPanelVisible(key, panel, btn, visible){
+  panel.classList.toggle("hidden", !visible);
+  btn.textContent = visible ? "Hide" : "Show";
+}
+
+function initToggleButtons(){
+  const state = getToggleState();
+
+  // Ensure default is hidden
+  const map = {
+    resale90: resale90Panel,
+    resale40: resale40Panel,
+    resaleOz: resaleOzPanel,
+    resaleRnd: resaleRndPanel,
+    resaleAse: resaleAsePanel,
+    resaleGold: resaleGoldPanel
+  };
+
+  document.querySelectorAll('button[data-toggle]').forEach(btn => {
+    const key = btn.getAttribute("data-toggle");
+    const panel = map[key];
+    const visible = !!state[key]; // default false
+    if (panel) setPanelVisible(key, panel, btn, visible);
+
+    btn.addEventListener("click", () => {
+      const st = getToggleState();
+      const now = !st[key];
+      st[key] = now;
+      setToggleState(st);
+      setPanelVisible(key, panel, btn, now);
+    });
+  });
+}
 
 // ---------------- Channel behavior ----------------
 function applyChannelDefault(selectEl, rangeEl, labelEl){
@@ -185,7 +222,6 @@ function updateSellLabel(rangeEl, labelEl){
   labelEl.textContent = `${fmt(parseNum(rangeEl.value), 1)}%`;
 }
 
-// When channel changes, snap slider to default
 [
   [resale90, sellPct90, sellPct90Label],
   [resale40, sellPct40, sellPct40Label],
@@ -204,7 +240,6 @@ function updateSellLabel(rangeEl, labelEl){
   });
 });
 
-// ---------------- Discount labels ----------------
 function updateDiscountLabels(){
   d90Label.textContent = `${parseNum(disc90.value)}%`;
   d40Label.textContent = `${parseNum(disc40.value)}%`;
@@ -217,6 +252,7 @@ function updateDiscountLabels(){
 // ---------------- Calc ----------------
 function calc(){
   updateDiscountLabels();
+
   updateSellLabel(sellPct90, sellPct90Label);
   updateSellLabel(sellPct40, sellPct40Label);
   updateSellLabel(sellPctOz, sellPctOzLabel);
@@ -227,23 +263,17 @@ function calc(){
   const sSpot = parseNum(spotSilver.value);
   const gSpot = parseNum(spotGold.value);
 
-  // ---- 90% bucket ----
+  // 90%
   const halves90  = parseIntSafe(h90.value);
   const quarters90= parseIntSafe(q90.value);
   const dimes90   = parseIntSafe(d90.value);
   const dollars90 = parseIntSafe(sd90.value);
 
-  const fv90 =
-    halves90   * 0.50 +
-    quarters90 * 0.25 +
-    dimes90    * 0.10;
-
+  const fv90 = halves90*0.50 + quarters90*0.25 + dimes90*0.10;
   const aswPerDollar = use715.checked ? ASW_90_PER_DOLLAR_WORN : ASW_90_PER_DOLLAR_BU;
   const asw90fv = fv90 * aswPerDollar;
   const asw90d  = dollars90 * ASW_90_DOLLAR;
-
-  const asw90Total = asw90fv + asw90d;
-  const melt90 = asw90Total * sSpot;
+  const melt90 = (asw90fv + asw90d) * sSpot;
   const offer90 = offerFromMelt(melt90, parseNum(disc90.value));
   const sell90 = sellFromMelt(melt90, parseNum(sellPct90.value));
   const profit90 = sell90 - offer90;
@@ -258,16 +288,14 @@ function calc(){
   outProfit90.textContent= money(profit90);
   setProfitClass(outProfit90, profit90);
 
-  // ---- 40% bucket ----
+  // 40%
   const halves40 = parseIntSafe(h40.value);
   const dollars40= parseIntSafe(sd40.value);
 
   const fv40 = halves40 * 0.50;
   const asw40h = halves40 * ASW_40_HALF;
   const asw40d = dollars40 * ASW_40_IKE;
-
-  const asw40Total = asw40h + asw40d;
-  const melt40 = asw40Total * sSpot;
+  const melt40 = (asw40h + asw40d) * sSpot;
   const offer40= offerFromMelt(melt40, parseNum(disc40.value));
   const sell40 = sellFromMelt(melt40, parseNum(sellPct40.value));
   const profit40 = sell40 - offer40;
@@ -282,7 +310,7 @@ function calc(){
   outProfit40.textContent= money(profit40);
   setProfitClass(outProfit40, profit40);
 
-  // ---- other .999 oz ----
+  // other .999 oz
   const ozOther = parseNum(ozOtherSilver.value);
   const meltOz = ozOther * sSpot;
   const offerOz= offerFromMelt(meltOz, parseNum(discOz.value));
@@ -296,7 +324,7 @@ function calc(){
   outProfitOz.textContent= money(profitOz);
   setProfitClass(outProfitOz, profitOz);
 
-  // ---- rounds ----
+  // rounds
   const roundsCount = parseIntSafe(rounds.value);
   const rndOz = roundsCount * 1.0;
   const meltRnd = rndOz * sSpot;
@@ -311,7 +339,7 @@ function calc(){
   outProfitRnd.textContent= money(profitRnd);
   setProfitClass(outProfitRnd, profitRnd);
 
-  // ---- ASE ----
+  // ASE
   const aseCount = parseIntSafe(ase.value);
   const aseOz = aseCount * 1.0;
   const meltAse = aseOz * sSpot;
@@ -326,7 +354,7 @@ function calc(){
   outProfitAse.textContent= money(profitAse);
   setProfitClass(outProfitAse, profitAse);
 
-  // ---- Gold ----
+  // Gold
   const c25 = parseIntSafe(g25.value);
   const c5  = parseIntSafe(g5.value);
   const c10 = parseIntSafe(g10.value);
@@ -337,19 +365,10 @@ function calc(){
   const a50  = parseIntSafe(age50.value);
   const a100 = parseIntSafe(age100.value);
 
-  const agwPre33 =
-    c25 * PRE33_AGW.g25 +
-    c5  * PRE33_AGW.g5 +
-    c10 * PRE33_AGW.g10 +
-    c20 * PRE33_AGW.g20;
+  const goldOz =
+    c25*PRE33_AGW.g25 + c5*PRE33_AGW.g5 + c10*PRE33_AGW.g10 + c20*PRE33_AGW.g20 +
+    a10*AGE_AGW.age10 + a25*AGE_AGW.age25 + a50*AGE_AGW.age50 + a100*AGE_AGW.age100;
 
-  const agwAge =
-    a10  * AGE_AGW.age10 +
-    a25  * AGE_AGW.age25 +
-    a50  * AGE_AGW.age50 +
-    a100 * AGE_AGW.age100;
-
-  const goldOz = agwPre33 + agwAge;
   const meltGold = goldOz * gSpot;
   const offerGold= offerFromMelt(meltGold, parseNum(discGold.value));
   const sellGold = sellFromMelt(meltGold, parseNum(sellPctGold.value));
@@ -362,11 +381,11 @@ function calc(){
   outProfitGold.textContent= money(profitGold);
   setProfitClass(outProfitGold, profitGold);
 
-  // ---- Totals ----
+  // totals
   const totalMelt = melt90 + melt40 + meltOz + meltRnd + meltAse + meltGold;
   const totalOffer = offer90 + offer40 + offerOz + offerRnd + offerAse + offerGold;
   const totalSell  = sell90 + sell40 + sellOz + sellRnd + sellAse + sellGold;
-  const totalProfit= totalSell - totalOffer;
+  const totalProfit = totalSell - totalOffer;
 
   outTotalMelt.textContent = money(totalMelt);
   outTotalOffer.textContent= money(totalOffer);
@@ -376,13 +395,14 @@ function calc(){
 
   window.__lastTotals = { totalMelt, totalOffer, totalSell, totalProfit };
 
-  if (sSpot === 0 && gSpot === 0) status.textContent = "Enter spot prices. Resale % = your net expectation.";
-  else status.textContent = "Ready.";
+  status.textContent = (sSpot === 0 && gSpot === 0)
+    ? "Enter spot prices. Behind-scenes panels are hidden by default."
+    : "Ready.";
 }
 
 // ---------------- State + Quotes ----------------
-const STATE_KEY = "lotScannerState_v7";
-const QUOTES_KEY = "lotScannerQuotes_v7";
+const STATE_KEY = "lotScannerState_v8";
+const QUOTES_KEY = "lotScannerQuotes_v8";
 
 function getStateSnapshot(){
   return {
@@ -407,7 +427,10 @@ function getStateSnapshot(){
     resaleOz: resaleOz.value, sellPctOz: sellPctOz.value,
     resaleRnd: resaleRnd.value, sellPctRnd: sellPctRnd.value,
     resaleAse: resaleAse.value, sellPctAse: sellPctAse.value,
-    resaleGold: resaleGold.value, sellPctGold: sellPctGold.value
+    resaleGold: resaleGold.value, sellPctGold: sellPctGold.value,
+
+    // include toggle visibility so saved state restores your preference
+    resaleVisible: getToggleState()
   };
 }
 
@@ -422,7 +445,6 @@ function applyStateSnapshot(s){
   ozOtherSilver.value = s.ozOtherSilver ?? "";
   rounds.value = s.rounds ?? "";
   ase.value = s.ase ?? "";
-
   g25.value = s.g25 ?? ""; g5.value = s.g5 ?? ""; g10.value = s.g10 ?? ""; g20.value = s.g20 ?? "";
   age10.value = s.age10 ?? ""; age25.value = s.age25 ?? ""; age50.value = s.age50 ?? ""; age100.value = s.age100 ?? "";
 
@@ -445,17 +467,21 @@ function applyStateSnapshot(s){
   sellPctAse.value = s.sellPctAse ?? String(CHANNEL_DEFAULTS[resaleAse.value]);
   resaleGold.value = s.resaleGold ?? "refiner";
   sellPctGold.value = s.sellPctGold ?? String(CHANNEL_DEFAULTS[resaleGold.value]);
+
+  // restore toggle visibility if present
+  if (s.resaleVisible && typeof s.resaleVisible === "object") {
+    setToggleState(s.resaleVisible);
+  }
 }
 
 function saveState(){
   localStorage.setItem(STATE_KEY, JSON.stringify(getStateSnapshot()));
   status.textContent = "Saved to this iPhone.";
 }
+
 function loadState(){
   const raw = localStorage.getItem(STATE_KEY);
   if (raw) { try { applyStateSnapshot(JSON.parse(raw)); } catch {} }
-  // ensure labels show correctly
-  calc();
 }
 
 function clearCounts(){
@@ -465,7 +491,7 @@ function clearCounts(){
   calc();
 }
 
-// Quotes storage
+// Quotes
 function getQuotes(){
   const raw = localStorage.getItem(QUOTES_KEY);
   if (!raw) return [];
@@ -511,6 +537,10 @@ function loadQuote(id){
   const q = getQuotes().find(x => x.id === id);
   if (!q) return;
   applyStateSnapshot(q.snapshot);
+
+  // re-init toggles based on restored toggle state
+  initToggleButtons(); // safe: rebinds buttons, but we’ll guard duplicates below
+
   calc();
   status.textContent = `Loaded quote: ${q.name ? q.name : fmtDate(q.ts)}`;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -541,7 +571,6 @@ function renderQuotes(){
   }).join("");
 }
 
-// Quotes click handling
 quotesList.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (btn && btn.dataset && btn.dataset.action) {
@@ -575,7 +604,7 @@ spotSilver.addEventListener("touchend", () => spotSilver.focus(), { passive:true
 spotGold.addEventListener("touchend", () => spotGold.focus(), { passive:true });
 
 // Buttons
-saveBtn.addEventListener("click", saveState);
+saveBtn.addEventListener("click", () => { saveState(); });
 saveQuoteBtn.addEventListener("click", saveQuote);
 clearBtn.addEventListener("click", clearCounts);
 
@@ -587,27 +616,8 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// init defaults for sell % labels (first load)
-function initResaleDefaultsIfEmpty(){
-  // If sliders have empty/zero due to old state, set based on channel.
-  const pairs = [
-    [resale90, sellPct90, sellPct90Label],
-    [resale40, sellPct40, sellPct40Label],
-    [resaleOz, sellPctOz, sellPctOzLabel],
-    [resaleRnd, sellPctRnd, sellPctRndLabel],
-    [resaleAse, sellPctAse, sellPctAseLabel],
-    [resaleGold, sellPctGold, sellPctGoldLabel],
-  ];
-  pairs.forEach(([sel,rng,lab]) => {
-    if (!rng.value || parseNum(rng.value) === 0) applyChannelDefault(sel,rng,lab);
-    else updateSellLabel(rng,lab);
-  });
-}
-
+// Init: load state, init toggles, render quotes, calc
 loadState();
-initResaleDefaultsIfEmpty();
+initToggleButtons();
 renderQuotes();
 calc();
-
-
-
