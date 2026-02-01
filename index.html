@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <link rel="stylesheet" href="./styles.css?v=14" />
+  <link rel="stylesheet" href="./styles.css?v=15" />
 </head>
 
 <body>
@@ -21,7 +21,7 @@
         <h1>Quick Lot Scanner</h1>
         <p class="muted">Customer clean by default. Toggle behind-scenes when needed. Offline.</p>
       </div>
-      <div id="version" class="version">v14</div>
+      <div id="version" class="version">v15</div>
     </header>
 
     <!-- SPOT + SETTINGS -->
@@ -455,35 +455,41 @@
     </section>
 
     <!-- TOTALS -->
-    <section class="panel">
-      <h2>Grand totals</h2>
+  <section class="panel">
+  <div class="panelHead">
+    <h2>Grand totals</h2>
+    <button type="button" class="miniBtn ghost" data-toggle="totalsResale">Show</button>
+  </div>
 
-      <div class="results">
-        <div class="resultRow big">
-          <span>Total melt</span>
-          <strong id="outTotalMelt">$0.00</strong>
-        </div>
-        <div class="resultRow big">
-          <span>Total offer (bucket discounts)</span>
-          <strong id="outTotalOffer">$0.00</strong>
-        </div>
+  <div class="results">
+    <div class="resultRow big">
+      <span>Total melt</span>
+      <strong id="outTotalMelt">$0.00</strong>
+    </div>
+    <div class="resultRow big">
+      <span>Total offer (bucket discounts)</span>
+      <strong id="outTotalOffer">$0.00</strong>
+    </div>
 
-        <hr class="sep" />
+    <div id="totalsResalePanel" class="hidden">
+      <hr class="sep" />
 
-        <div class="resultRow big">
-          <span>Total expected sell</span>
-          <strong id="outTotalSell">$0.00</strong>
-        </div>
-        <div class="resultRow big">
-          <span>Total profit (sell − offer)</span>
-          <strong id="outTotalProfit" class="profit">$0.00</strong>
-        </div>
+      <div class="resultRow big">
+        <span>Total expected sell</span>
+        <strong id="outTotalSell">$0.00</strong>
       </div>
-
-      <div class="muted small">
-        “Behind scenes” panels are hidden by default. Tap Show when needed.
+      <div class="resultRow big">
+        <span>Total profit (sell − offer)</span>
+        <strong id="outTotalProfit" class="profit">$0.00</strong>
       </div>
-    </section>
+    </div>
+  </div>
+
+  <div class="muted small">
+    Totals resale/profit are hidden by default for customer view.
+  </div>
+</section>
+
 
     <!-- QUOTES -->
     <section class="panel">
@@ -503,6 +509,7 @@
   <script src="./app.js"></script>
 </body>
 </html>
+
 
 
 
