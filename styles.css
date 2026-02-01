@@ -143,6 +143,12 @@ button{
 
 button.ghost{ background:#14141a; }
 
+.miniBtn{
+  padding:8px 10px;
+  font-size:14px;
+  border-radius:10px;
+}
+
 .status{ margin-top:10px; }
 
 .results{ margin-top: 8px; }
@@ -167,16 +173,26 @@ button.ghost{ background:#14141a; }
 }
 .miniRow.big strong{ font-size: 17px; }
 
-.resale{
+.resaleWrap{
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px dashed var(--line);
 }
+
+.resaleTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom: 6px;
+}
+
 .resaleHead{
   font-weight: 700;
-  margin-bottom: 6px;
   color: #dcdcdc;
 }
+
+.resale.hidden{ display:none; }
 
 .profit.pos { color: #9be7a2; }
 .profit.neg { color: #ff9a9a; }
