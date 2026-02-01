@@ -16,10 +16,10 @@ const AGE_AGW   = { age10:0.10, age25:0.25, age50:0.50, age100:1.00 };
 // These are "net to you" expectations after spread/fees.
 // You can override per bucket with the slider.
 const CHANNEL_DEFAULTS = {
-  wholesale: 98.0,
-  refiner: 99.5,
-  ebay: 90.0,
-  public: 103.0
+  wholesale: 80.0,
+  refiner: 80,
+  ebay: 85.0,
+  public: 102.0
 };
 
 // ---------------- DOM helpers ----------------
@@ -608,3 +608,4 @@ loadState();
 initResaleDefaultsIfEmpty();
 renderQuotes();
 calc();
+
