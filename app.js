@@ -1,4 +1,4 @@
-const APP_VERSION = "v18";
+const APP_VERSION = "v19";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -630,5 +630,6 @@ loadState();
 syncAllToggleButtons();
 renderQuotes();
 calc();
+
 
 
