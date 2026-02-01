@@ -1,4 +1,4 @@
-const APP_VERSION = "v10";
+const APP_VERSION = "v11";
 document.getElementById("version").textContent = APP_VERSION;
 
 // ---------------- Constants ----------------
@@ -608,5 +608,6 @@ loadState();
 initResaleDefaultsIfEmpty();
 renderQuotes();
 calc();
+
 
 
