@@ -1,3 +1,16 @@
-Provides quick quote for gold, silver lots
+# Quick Lot Scanner (Offline PWA)
 
-Has quotes for different payout options. Mobile friendly but works best on PC or iPad
+## Run
+Open: GitHub Pages URL.
+
+## Install on iPhone or iPad
+Safari → Share → Add to Home Screen.
+
+## Update / Release
+- Bump version:
+  - index.html: styles.css?v=##
+  - app.js: APP_VERSION = "v##"
+  - sw.js: CACHE = "...-v##"
+- Commit + push
+- Open in Safari and refresh once
+- If Home Screen is stuck: delete icon → add again
